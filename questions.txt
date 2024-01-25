@@ -1,0 +1,21 @@
+1. what is the relevant design/sample information from this study?
+	- english/non-english, urban/rural, age, socioeconomic status.
+
+2. what are the explanatory and response variables that Darla is most
+interested in?
+	- response: pre-post scores on: forms, numbers, letters.
+	- watch time, encouragement.
+
+3. what should be a case for these data?
+	- a kid.
+
+4. Imagine how this data should be formatted.
+	- it should have a single case (child) and it should have all of the
+	  test scores in addition to the confounding variables.
+	- for each test category, there should be a separate column for the
+	  difference between pre and post in each category.
+
+5. Look at data files which tasks must be performed to get these data in an
+appropriate form for analysis?
+	- we should first wrangle the csv file. Then we should import xslx and
+	  csv files into R. Finally we can append them.
