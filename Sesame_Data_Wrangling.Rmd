@@ -1,0 +1,46 @@
+---
+title: "Sesame_Data_Wrangling"
+author: "Armelle Duston"
+date: "2024-01-30"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+```{r}
+library(tidyverse)
+```
+
+
+## Import raw data
+```{r}
+covariates <- read.csv("sesame_covariates.csv")
+scores <- read.csv("test_scores.csv")
+
+glimpse(covariates)
+glimpse(scores)
+```
+
+## Wrangle
+```{r}
+
+#separate name column into ID and name in covariates
+cov_w_ID <- covariates |> 
+  separate(col = name,
+           into = c("ID", "name"),
+           sep = ". ",
+           extra = "merge") 
+cov_w_ID$ID <- as.integer(cov_w_ID$ID)
+
+#pivot test scores long to wide
+flipped_scores <- scores |> pivot_wider(names_from = test_name,
+                                        values_from = score)
+#merge to make one dataframe
+final_df <- cov_w_ID |> left_join(flipped_scores, by = "ID")
+
+
+```
+
