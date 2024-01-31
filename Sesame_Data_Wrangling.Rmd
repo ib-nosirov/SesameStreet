@@ -50,9 +50,21 @@ scores_w_diff <- flipped_scores |> mutate(body_diff = postbody - prebody,
 
 
 # merge to make one dataframe
-final_df <- cov_w_ID |> left_join(scores_w_diff, by = "ID")
+merged_df <- cov_w_ID |> left_join(scores_w_diff, by = "ID")
+
+glimpse(merged_df)
 
 ```
+
+
+## Final touches and remove extra variables
+```{r}
+final_df <- subset(merged_df, select = -c(peabody,viewenc,regular))
+final_df <- drop_na(final_df)
+
+```
+
+
 
 ## Export new dataframe
 ```{r}

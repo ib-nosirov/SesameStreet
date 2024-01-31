@@ -13,12 +13,126 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(ggplot2)
+library(GGally)
 
 ```
 
 
 ## Import Data
 ```{r}
+just_scores <- read.csv('test_scores.csv')
+subset_scores <- subset(just_scores, 
+                        grepl('let', test_name) | 
+                        grepl('form', test_name) | 
+                        grepl('numb', test_name))
+
+subset_scores <- subset_scores |> 
+  mutate(which_test = case_when(grepl('let', test_name) ~ 'letters',
+                                grepl('form', test_name) ~ 'forms',
+                                grepl('numb', test_name) ~ 'numbers'))
+
 Data <- read.csv('clean_df.csv')
+
+Data <-  Data |> 
+  mutate(encour = case_when(encour == 0 ~ 'No',
+                            encour == 1 ~ 'Yes'))
+
+# make categorical variables categorical 
+Data$site <-  as.character(Data$site)
+Data$sex <-  as.character(Data$sex)
+Data$viewcat <-  as.character(Data$viewcat)
+Data$setting <-  as.character(Data$setting)
+
+
+glimpse(Data)
 ```
+
+
+## Research Question 1: Does our programming improve children’s knowledge of letters, numbers, and forms?
+
+Comparing improvement (post-test - pre-test) based on viewcat (higher number = watched more)
+```{r}
+
+ggplot(Data, aes(x = viewcat, y = let_diff, fill = viewcat)) +
+  geom_boxplot() +
+  xlab("Viewing Category (high number = viewed more)") + 
+  ylab("Letters Improvement (Posttest - Pretest)") + 
+  labs(title = "Comparing Letters Outcomes by Viewing Category", 
+       fill = "Viewing category")
+
+ggplot(Data, aes(x = viewcat, y = numb_diff, fill = viewcat)) +
+  geom_boxplot() +
+  xlab("Viewing Category (high number = viewed more)") + 
+  ylab("Numbers Improvement (Posttest - Pretest)") + 
+  labs(title = "Comparing Numbers Outcomes by Viewing Category", 
+       fill = "Viewing category")
+
+ggplot(Data, aes(x = viewcat, y = form_diff, fill = viewcat)) +
+  geom_boxplot() +
+  xlab("Viewing Category (high number = viewed more)") + 
+  ylab("Forms Improvement (Posttest - Pretest)") + 
+  labs(title = "Comparing Forms Outcomes by Viewing Category", 
+       fill = "Viewing category")
+
+```
+
+Comparing improvement (post-test - pre-test) based on encouragement (1 = was encouraged)
+```{r}
+
+ggplot(Data, aes(x = encour, y = let_diff, fill = encour)) +
+  geom_boxplot() +
+  xlab("Recieved Encouragement") +
+  ylab("Letters Improvement (Posttest - Pretest)") + 
+  labs(title = "Comparing Letters Outcomes by Viewing Encouragement",
+       fill = "Recieved Encouragement")
+
+ggplot(Data, aes(x = encour, y = numb_diff, fill = encour)) +
+  geom_boxplot() +
+  xlab("Recieved Encouragement") +
+  ylab("Numbers Improvement (Posttest - Pretest)") + 
+  labs(title = "Comparing Numbers Outcomes by Viewing Encouragement",
+       fill = "Recieved Encouragement")
+
+ggplot(Data, aes(x = encour, y = form_diff, fill = encour)) +
+  geom_boxplot() +
+  xlab("Recieved Encouragement") +
+  ylab("Forms Improvement (Posttest - Pretest)") + 
+  labs(title = "Comparing Forms Outcomes by Viewing Encouragement", 
+       fill = "Recieved Encouragement")
+
+```
+
+
+
+## Research Question 2: What, if any, area should we focus on for improvement?  E.g. are we better at teaching letters than we are at numbers?
+```{r}
+subset_scores$test_name <- factor(subset_scores$test_name,
+    levels = c('preform','postform', 'prelet', 'postlet', 'prenumb', 'postnumb'),ordered = TRUE)
+
+
+ggplot(subset_scores, aes(x = test_name, y = score, fill = which_test)) +
+  geom_boxplot() +
+  xlab("Which Test") + 
+  ylab("Test Score") +
+  labs(title = "Comparing Pre- and Post- Test Scores for Forms, Letters, and Numbers",
+       fill = "Which Test")
+
+ggplot(subset_scores, aes(x = which_test, y = score, fill = which_test)) +
+  geom_boxplot() +
+  xlab("Which Test") + 
+  ylab("Test Score") +
+  labs(title = "Comparing Average Test Scores for Forms, Letters, and Numbers",
+       fill = "Which Test")
+```
+
+
+
+
+
+
+
+
+
+
+
 
