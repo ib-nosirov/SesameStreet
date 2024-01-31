@@ -52,6 +52,11 @@ scores_w_diff <- flipped_scores |> mutate(body_diff = postbody - prebody,
 # merge to make one dataframe
 final_df <- cov_w_ID |> left_join(scores_w_diff, by = "ID")
 
+```
+
+## Export new dataframe
+```{r}
+write.csv(final_df, "clean_df.csv", row.names=FALSE)
 
 ```
 
