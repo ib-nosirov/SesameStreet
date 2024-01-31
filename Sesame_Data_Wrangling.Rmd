@@ -27,7 +27,7 @@ glimpse(scores)
 ## Wrangle
 ```{r}
 
-#separate name column into ID and name in covariates
+# separate name column into ID and name in covariates
 cov_w_ID <- covariates |> 
   separate(col = name,
            into = c("ID", "name"),
@@ -35,11 +35,22 @@ cov_w_ID <- covariates |>
            extra = "merge") 
 cov_w_ID$ID <- as.integer(cov_w_ID$ID)
 
-#pivot test scores long to wide
+# pivot test scores long to wide
 flipped_scores <- scores |> pivot_wider(names_from = test_name,
                                         values_from = score)
-#merge to make one dataframe
-final_df <- cov_w_ID |> left_join(flipped_scores, by = "ID")
+
+# add post - pre column
+
+scores_w_diff <- flipped_scores |> mutate(body_diff = postbody - prebody,
+                                  let_diff = postlet - prelet,
+                                  form_diff = postform - preform,
+                                  numb_diff = postnumb - prenumb,
+                                  relat_diff = postrelat - prerelat,
+                                  clasf_diff = postclasf - preclasf)
+
+
+# merge to make one dataframe
+final_df <- cov_w_ID |> left_join(scores_w_diff, by = "ID")
 
 
 ```
