@@ -53,52 +53,70 @@ glimpse(Data)
 Comparing improvement (post-test - pre-test) based on viewcat (higher number = watched more)
 ```{r}
 
-ggplot(Data, aes(x = viewcat, y = let_diff, fill = viewcat)) +
-  geom_boxplot() +
-  xlab("Viewing Category (high number = viewed more)") + 
-  ylab("Letters Improvement (Posttest - Pretest)") + 
-  labs(title = "Comparing Letters Outcomes by Viewing Category", 
-       fill = "Viewing category")
+plot <- ggplot(Data, aes(x = viewcat, y = let_diff, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time (higher value=more)") + 
+  ylab("Improvement") + 
+  labs(title = "Letters") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("boxLetters.png", plot, width = 8, height = 6, dpi = 300)
 
-ggplot(Data, aes(x = viewcat, y = numb_diff, fill = viewcat)) +
-  geom_boxplot() +
-  xlab("Viewing Category (high number = viewed more)") + 
-  ylab("Numbers Improvement (Posttest - Pretest)") + 
-  labs(title = "Comparing Numbers Outcomes by Viewing Category", 
-       fill = "Viewing category")
+plot <- ggplot(Data, aes(x = viewcat, y = numb_diff, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Improvement") + 
+  labs(title = "Numbers") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("boxNumbers.png", plot, width = 8, height = 6, dpi = 300)
 
-ggplot(Data, aes(x = viewcat, y = form_diff, fill = viewcat)) +
-  geom_boxplot() +
-  xlab("Viewing Category (high number = viewed more)") + 
-  ylab("Forms Improvement (Posttest - Pretest)") + 
-  labs(title = "Comparing Forms Outcomes by Viewing Category", 
-       fill = "Viewing category")
+plot <- ggplot(Data, aes(x = viewcat, y = form_diff, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Improvement") + 
+  labs(title = "Forms") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("boxForms.png", plot, width = 8, height = 6, dpi = 300)
 
 ```
 
 Comparing improvement (post-test - pre-test) based on encouragement (1 = was encouraged)
 ```{r}
 
-ggplot(Data, aes(x = encour, y = let_diff, fill = encour)) +
-  geom_boxplot() +
-  xlab("Recieved Encouragement") +
-  ylab("Letters Improvement (Posttest - Pretest)") + 
-  labs(title = "Comparing Letters Outcomes by Viewing Encouragement",
-       fill = "Recieved Encouragement")
+plot <- ggplot(Data, aes(x = encour, y = let_diff, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Improvement") + 
+  labs(title = "Letters") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("boxLetters.png", plot, width = 8, height = 6, dpi = 300)
 
-ggplot(Data, aes(x = encour, y = numb_diff, fill = encour)) +
-  geom_boxplot() +
-  xlab("Recieved Encouragement") +
-  ylab("Numbers Improvement (Posttest - Pretest)") + 
-  labs(title = "Comparing Numbers Outcomes by Viewing Encouragement",
-       fill = "Recieved Encouragement")
+plot <- ggplot(Data, aes(x = encour, y = numb_diff, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Improvement") + 
+  labs(title = "Numbers") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("boxNumbers.png", plot, width = 8, height = 6, dpi = 300)
 
-ggplot(Data, aes(x = encour, y = form_diff, fill = encour)) +
-  geom_boxplot() +
-  xlab("Recieved Encouragement") +
-  ylab("Forms Improvement (Posttest - Pretest)") + 
-  labs(title = "Comparing Forms Outcomes by Viewing Encouragement", 
-       fill = "Recieved Encouragement")
+plot <- ggplot(Data, aes(x = encour, y = form_diff, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Improvement") + 
+  labs(title = "Forms") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("boxForms.png", plot, width = 8, height = 6, dpi = 300)
 
 ```
 
@@ -110,19 +128,26 @@ subset_scores$test_name <- factor(subset_scores$test_name,
     levels = c('preform','postform', 'prelet', 'postlet', 'prenumb', 'postnumb'),ordered = TRUE)
 
 
-ggplot(subset_scores, aes(x = test_name, y = score, fill = which_test)) +
-  geom_boxplot() +
+plot <- ggplot(subset_scores, aes(x=test_name, y=score, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") + 
   ylab("Test Score") +
-  labs(title = "Comparing Pre- and Post- Test Scores for Forms, Letters, and Numbers",
-       fill = "Which Test")
+  labs(title = "Pre and Post Test Scores") +
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        axis.text.x = element_blank(),
+        title=element_text(size=25,face="bold"))
+  ggsave("PrePostBox.png", plot, width = 8, height = 6, dpi = 300)
 
-ggplot(subset_scores, aes(x = which_test, y = score, fill = which_test)) +
-  geom_boxplot() +
+plot <- ggplot(subset_scores, aes(x=which_test, y=score, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") + 
   ylab("Test Score") +
-  labs(title = "Comparing Average Test Scores for Forms, Letters, and Numbers",
-       fill = "Which Test")
+  labs(title = "Average Test Scores") + 
+  theme(axis.text=element_text(size=22),
+        axis.title=element_text(size=30,face="bold"),
+        title=element_text(size=25,face="bold"))
+  ggsave("CategoriesBox.png", plot, width = 8, height = 6, dpi = 300)
 ```
 
 
