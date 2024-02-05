@@ -1,0 +1,136 @@
+---
+title: "Sesame Street Report [Draft]"
+author: 'Armelle, Sara, Ibrohim,'
+date: 'February 05, 2024'
+format: pdf
+---
+
+```{r}
+#| echo: false
+#| include: false
+#| label: front-matter
+#| warning: false
+# clean up & set default chunk options
+rm(list = ls())
+knitr::opts_chunk$set(echo = FALSE)
+
+# packages
+library(tidyverse) # for example
+library(mosaic)    # for example
+library(ggformula) # for example
+library(car)       # for example
+library(tinytex)   # for example
+```
+
+## 1. Project Description
+
+The project involves an observational study designed to assess the impact of
+"Sesame Street" viewership on children's learning outcomes, particularly in
+letters, numbers, and forms. The study is in the planning stage, aiming to
+analyze existing data collected from children across five different sites,
+including variables such as viewing frequency, setting, and encouragement to
+watch, alongside pretest scores of vocabulary maturity (Peabody Picture
+Vocabulary Test). The objective is to determine the program's effectiveness in
+educational content delivery and identify areas for improvement. Results will
+be used to enhance "Sesame Street's" educational focus and effectiveness, as
+per the client's request for an upcoming board meeting presentation.
+
+## 1.1 Research Questions
+
+## 1.1 Research Questions
+
+**Question 1:** How does viewership of "Sesame Street" influence children's learning outcomes, specifically in terms of letters, numbers, and forms knowledge, as measured by the percent increase in post-test scores compared to pre-test scores?
+
+**Question 2:** What is the percent achievable gain (PAG) in learning outcomes for children who watch "Sesame Street," considering the maximum possible score improvement based on their initial knowledge level?
+
+## 1.2 Variables
+
+| Variable Type       | Variable Name          | Description                                                                                      | Measurement/Recording                                    |
+|---------------------|------------------------|--------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| Explanatory         | Viewing Frequency      | Frequency of "Sesame Street" viewership by children.                                             | Recorded as the number of episodes watched per week.     |
+| Explanatory         | Viewing Setting        | Context in which "Sesame Street" is watched (e.g., at home, in school).                         | Categorical variable (Home, School, Other).              |
+| Explanatory         | Encouragement to Watch | Level of encouragement from parents or teachers for children to watch "Sesame Street."           | Binary variable (Yes, No).                               |
+| Response            | Percent Increase       | Difference in test scores before and after the exposure period, adjusted for scale differences.  | Calculated as percent_post_test - percent_pre_test.      |
+| Response            | Percent Achievable Gain (PAG) | Improvement in score relative to the maximum possible improvement. | Calculated as score_diff/(max_score - pre_score). |
+
+#  2. Exploratory Data Analysis (EDA)
+
+The Exploratory Data Analysis (EDA) of the Sesame Street study integrates
+comprehensive assessment and insights into children's learning improvements
+attributed to the program. Through examining pre- and post-test outcomes over a
+six-month interval among children aged 3-5, the study aims to quantify the
+educational impact of Sesame Street on early learning metrics such as literacy
+and numeracy. It meticulously considers variables like demographics, viewing
+habits, and educational encouragement while addressing analytical challenges
+like variance disparities, confounders, and multicollinearity. Initial findings
+indicate variable program effectiveness, suggesting a correlation between
+viewing frequency and educational advancement. The planned next steps involve
+sophisticated statistical techniques to refine these insights, setting a robust
+foundation for conclusive analysis and program enhancement strategies.
+
+# 3. Statistical Analysis 
+
+To effectively communicate the statistical analysis conducted in the Sesame
+Street study, it's essential to balance technical accuracy with clarity for a
+broader audience. The analysis began with verifying the assumptions of our
+statistical models, such as linearity, independence, and normal distribution of
+residuals, through diagnostic plots and tests, details of which are in the
+appendix.
+
+We interpreted the results in the context of the study's objectives. For
+example, p-values were used to determine the statistical significance of the
+relationship between Sesame Street viewership and learning outcomes. Lower
+p-values indicated a stronger evidence against the null hypothesis, suggesting
+that viewership does indeed impact learning outcomes.
+
+The analysis, detailed enough for replication by another statistician, involved
+comparing pre- and post-test scores, adjusting for confounding variables, and
+employing ANOVA to understand the variance among different groups. This
+approach allowed us to draw meaningful conclusions about the program's
+effectiveness.
+
+# 4. Recommendations
+
+## Question 1
+
+Our analysis indicates a positive correlation between Sesame Street viewership
+and improved learning outcomes in children. Strategies to increase engagement
+and content accessibility are recommended to leverage this educational impact.
+
+## Question 2
+
+The analysis of Percent Achievable Gain (PAG) suggests that personalized
+content, based on the child's initial abilities, can significantly enhance
+learning outcomes. We advise focusing on customized learning experiences.
+
+# 5. Resources
+
+- **Educational Technology Journals**: For cutting-edge research on educational
+  media impacts.
+- **Sesame Workshop's Research Portal**: Insights into educational content
+  effectiveness.
+- **Educator and Parent Online Communities**: For sharing strategies and
+  experiences.
+
+# 6. Additional Considerations
+
+While our recommendations are based on current findings, variability in
+individual learning responses and the long-term effects of media-based
+education warrant further study. Concerns about demographic and contextual
+factors suggest the need for tailored approaches. Future studies could benefit
+from more sophisticated data analysis techniques and a broader consideration of
+parental involvement.
+  
+
+# Technical Appendix  
+
+*Detailed information and a copy of code and or software results.  Additional graphs and supporting figures may also be placed in the appendix.*
+
+
+### R Script
+```{r ref.label=c('front-matter', 'fig-example1','tbl-summarystats', 'fig-example2')}
+#| echo: true
+#| eval: false
+
+# Reprinted code chunks used previously for analysis
+```
