@@ -1,0 +1,157 @@
+---
+title: "Sample Report"
+author: 'Student A, Student B, Student C'
+date: 'January 25, 2033'
+format: pdf
+---
+
+```{r}
+#| echo: false
+#| include: false
+#| label: front-matter
+#| warning: false
+# clean up & set default chunk options
+rm(list = ls())
+knitr::opts_chunk$set(echo = FALSE)
+
+# packages
+library(tidyverse) # for example
+library(mosaic)    # for example
+library(ggformula) # for example
+library(car)       # for example
+library(tinytex)   # for example
+
+# read in data 
+
+# use this space to do any data processing you need
+
+```
+
+
+## 1. Project Description
+
+*Should be in paragraph from (not bullets).  Written for a 3rd party such as your client’s boss, or an external review board.  As part of your description, consider the following:*
+
+- *Type of study [Designed experiment, Observational study, Sample survey] and brief description of design*
+- *Stage of the experiment [Planning stage or Analysis stage]*
+- *Objective of study and role of this analysis*
+- *Scope of project*
+- *Intended use for results*
+
+## 1.1 Research Questions
+
+
+*What are the overarching research questions that the client is targeting?*
+
+**Question 1:**  
+
+**Question 2:**  
+
+*(order them by priority; RQ1 is highest priority)*
+
+## 1.2 Variables
+
+*What is (are) possible explanatory and response variables?  Relevant notes about how each is measured/recorded.*
+
+*A table is recommended here. *
+
+
+*If design is complex, here is a good place to write a detailed description.*
+
+#  2. Exploratory Data Analysis (EDA)
+
+*Description of important variables.*
+- *summary statistics*
+- *missing Data*
+- *unusual or concerning observations*
+
+*Relevant summary figures that provide intuition for the research questions and/or inform important modeling decisions (correlation structure, etc).*
+
+For example, notice the way @fig-example1 shows a scatterplot.
+
+```{r}
+#| echo: false
+#| label: fig-example1
+#| warning: false
+#| fig-cap: "Fuel Efficiency as it relates to vehicle weight for a sample of cars."
+#| fig-align: "center"
+#| fig-width: 3
+#| fig-height: 3
+
+
+data("mtcars")
+gf_point(mpg~ wt, data = mtcars)
+```
+
+These are interesting remarks about data summaries.  The overall mean fuel economy in the data is `r mean(mtcars$mpg, na.rm = TRUE)` miles per gallon, which I can calculate in-line since it's very simple.  Most code requires a code chunk, but raw code and output should never appear in the body of the report.  Here's a nice table of summary statistics formatted for the report in @tbl-summarystats.
+
+```{r}
+#| echo: false
+#| label: tbl-summarystats
+#| tbl-cap: "Summary Statistics for Engine Displacement by Cylinders"
+
+favstats(disp ~ cyl, data = mtcars) %>%
+  knitr::kable()
+
+```
+
+*Describe important outcomes of the EDA that the reader should notice.*
+
+# 3. Statistical Analysis 
+
+
+*Describe statistical analysis in terms that your client will be able to understand and perhaps use in presenting their own research.  This section should summarize all relevant analyses that lead to your final conclusions/decisions/recommendations, but should NEVER include visible code (folded code chunks are fine) or unformatted software output.*
+
+- *Model Assumptions & how checked/verified (details left to appendix)*
+- *Interpretation of estimates/statistics/p-values IN CONTEXT*
+- *Enough detail that the model/analysis could be reproduced by another statistician*
+
+Look at @fig-example2 to see what figure with subfigures looks like.
+
+```{r}
+#| label: fig-example2
+#| layout-ncol: 2
+#| fig-cap: "A figure with two subfigures!"
+#| fig-subcap:  
+#|   - "Line Plot 1"
+#|   - "Line Plot 2"
+
+
+plot(cars)
+plot(pressure)
+```
+
+
+# 4. Recommendations 
+
+*Succinct response to each question laid out in 1.2.  This a much shorter version of section 3, and focuses on conclusions rather than the analyses.*
+
+**Question 1:**  
+
+**Question 2:**  
+
+*(all research questions in 1.1 and/or statistical question in 1.2 should be addressed, in the same order)*
+
+# 5. Resources 
+
+*List resources that your client might find useful*
+
+# 6. Additional Considerations
+
+- *Limitations to the recommendations*
+- *Concerns you may have about the study; suggestions for similar studies in future*
+- *Technical comments*
+  
+
+# Technical Appendix  
+
+*Detailed information and a copy of code and or software results.  Additional graphs and supporting figures may also be placed in the appendix.*
+
+
+### R Script
+```{r ref.label=c('front-matter', 'fig-example1','tbl-summarystats', 'fig-example2')}
+#| echo: true
+#| eval: false
+
+# Reprinted code chunks used previously for analysis
+```
