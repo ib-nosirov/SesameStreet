@@ -41,34 +41,87 @@ flipped_scores <- scores |> pivot_wider(names_from = test_name,
 
 # add post - pre column
 
-scores_w_diff <- flipped_scores |> mutate(body_diff = postbody - prebody,
-                                  let_diff = postlet - prelet,
+scores_w_diff <- flipped_scores |> mutate(let_diff = postlet - prelet,
                                   form_diff = postform - preform,
-                                  numb_diff = postnumb - prenumb,
-                                  relat_diff = postrelat - prerelat,
-                                  clasf_diff = postclasf - preclasf)
+                                  numb_diff = postnumb - prenumb)
 
+# add percent scores
+let_max <- 58
+form_max <- 20
+numb_max <- 54
 
-# merge to make one dataframe
-merged_df <- cov_w_ID |> left_join(scores_w_diff, by = "ID")
+scores_w_pct <- scores_w_diff |>
+  mutate(prelet_pct = prelet/let_max,
+         postlet_pct = postlet/let_max,
+         let_diff_pct = postlet_pct - prelet_pct,
+         
+         preform_pct = preform/form_max,
+         postform_pct = postform/form_max,
+         form_diff_pct = postform_pct - preform_pct,
+         
+         prenumb_pct = prenumb/numb_max,
+         postnumb_pct = postnumb/numb_max,
+         numb_diff_pct = postnumb_pct - prenumb_pct,)
 
-glimpse(merged_df)
+```
+
+## Define and percent achieveable gain (PAG)
+```{r}
+
+scores_w_PAG <- scores_w_pct |> mutate(letPAG = let_diff/(let_max - prelet),
+                                          formPAG = form_diff/(form_max - preform),
+                                          numbPAG = numb_diff/(numb_max - prenumb))
 
 ```
 
 
 ## Final touches and remove extra variables
 ```{r}
-final_df <- subset(merged_df, select = -c(peabody,viewenc,regular))
-final_df <- drop_na(final_df)
+# merge to make one dataframe
+merged_df <- cov_w_ID |> left_join(scores_w_PAG, by = "ID")
+
+# rename encour and sex values
+merged_df <-  merged_df |> 
+  mutate(encour = case_when(encour == 0 ~ 'No',
+                            encour == 1 ~ 'Yes'))
+
+merged_df <-  merged_df |> 
+  mutate(sex = case_when(sex == 1 ~ 'Male',
+                         sex == 2 ~ 'Female'))
+
+# subset only information we are interested in
+final_df_wide <- subset(merged_df, select = -c(viewenc,regular, prebody, prerelat, preclasf, postbody, postrelat, postclasf))
+final_df_wide <- drop_na(final_df_wide)
 
 ```
 
 
+## Make long version
+```{r}
+final_df_long <- final_df_wide |>
+  pivot_longer(cols = c('letPAG', 'formPAG', 'numbPAG'),
+               names_to = 'whichPAG',
+               values_to = 'PAG')
+
+final_df_long <- final_df_long |>
+  pivot_longer(cols = c('let_diff_pct', 'form_diff_pct', 'numb_diff_pct'),
+               names_to = 'which_diff_pct',
+               values_to = 'diff_pct')
+
+final_df_long <- final_df_long |> 
+  mutate(which_test = case_when(grepl('let', whichPAG) ~ 'letters',
+                                grepl('form', whichPAG) ~ 'forms',
+                                grepl('numb', whichPAG) ~ 'numbers'))
+
+```
+
 
 ## Export new dataframe
 ```{r}
-write.csv(final_df, "clean_df.csv", row.names=FALSE)
+
+write.csv(final_df_wide, "clean_df_wide.csv", row.names=FALSE)
+write.csv(final_df_long, "clean_df_long.csv", row.names=FALSE)
+
 
 ```
 
