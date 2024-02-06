@@ -13,6 +13,7 @@ output: pdf_document
 # clean up & set default chunk options
 rm(list = ls())
 knitr::opts_chunk$set(echo = FALSE)
+options(ggplot2.discrete.fill=c("palevioletred2","darkseagreen2","cadetblue1","steelblue1","mediumpurple1"))
 
 # packages
 library(tidyverse) 
@@ -35,18 +36,18 @@ longData$setting <-  as.character(longData$setting)
 
 ## 1. Project Description
 
-The project involves an observational study designed to assess the impact of "Sesame Street" viewership on children's learning outcomes, particularly in letters, numbers, and forms. The study is in the planning stage, aiming to analyze existing data collected from children across five different sites, including variables such as viewing frequency, setting, and encouragement to watch, alongside pretest scores of vocabulary maturity (Peabody Picture Vocabulary Test). The objective is to determine the program's effectiveness in educational content delivery and identify areas for improvement. Results will be used to enhance "Sesame Street's" educational focus and effectiveness, as per the client's request for an upcoming board meeting presentation.
+The project involves an observational study designed to assess the impact of "Sesame Street" viewership on children's learning outcomes, particularly in letters, numbers, and forms. The study is in the analysis stage, examining existing data collected from children across five different sites in the United States. Variables observed include, but are not limited to, viewing frequency, setting, encouragement to watch, and pretest scores of vocabulary maturity (Peabody Picture Vocabulary Test). Its objective is to determine the show's effectiveness in educational content delivery and identify areas for improvement. Results will be used to enhance Sesame Street's educational focus and impact, as per the client's request for an upcoming board meeting presentation.
 
 ## 1.1 Research Questions
 
-**Question 1:** How does viewership of "Sesame Street" influence children's learning outcomes, specifically in terms of letters, numbers, and forms knowledge, as measured by the percent increase in post-test scores compared to pre-test scores? Is this result consistent if we instead consider percent achievable gain (PAG)?
+**Question 1:** How does viewership of Sesame Street influence children's learning outcomes - specifically in terms of letters, numbers, and forms knowledge - as measured by the percent increase in post-test scores compared to pre-test scores? Is this result consistent if we instead consider percent achievable gain (PAG)?
 
 **Question 2:** Which area, of letters, numbers, and forms, has the most room for improvement? Which should Sesame street focus on improving in the future?
 
 
 ## 1.2 Variables
 
-We considered a variety of variables in our preliminary analyses of the Sesame Street study. The dataset contained many possible explanatory variables, but we chose to focus on amount of show watched (Viewcat) as our "treatment" variable and site, sex, age, setting, and encouragement as possible confounding variables. Although there were other variables included in the dataset, we decided that these were the most important ones to answer our client's research questions. Although the dataset contained pre- and post-test scores for six different domains, we were only interested in scores for letters, forms, and numbers. We defined two possible response variables: percent achievable gain (PAG) and percent increase. The first, PAG, is the the child's improvement divided by total possible improvement. The goal with this measure is to capture improvement while accounting for the fact that students that are already advanced cannot improve as much as those who are not as advanced to begin with. The second, percent increase, is simply the difference between the post-score percent and the pre-score percent. All variables we used in our analysis are summarized in the table below.
+We considered a variety of variables in our preliminary analysis of the Sesame Street study. The dataset contained several explanatory variables, but we chose to focus on viewing frequency (Viewcat) as our main explanatory variable; and site, sex, age, setting, and encouragement as possible confounding variables. The dataset contained pre- and post-test scores for six different domains, but we were only interested in scores for letters, numbers, and forms. We also defined two possible response variables: percent increase and percent achievable gain (PAG). The first, percent increase, is simply the difference between the posttest score and pretest score, as percentages. The second, PAG, is the child's improvement (post-test score minus pre-test score) divided by total possible improvement (maximum test score minus pretest score). The goal with this measure is to capture improvement while accounting for the fact that advanced students cannot improve as much as those who were not as advanced to begin with. All variables used in our analysis are summarized in the table below. Although there were other variables included in the dataset, we decided that these were the most important ones to answer our client's research questions.
 
 ```{r}
 #| label: tbl-variables
@@ -65,9 +66,9 @@ knitr::kable(variable.desc)
 
 #  2. Exploratory Data Analysis (EDA)
 
-Our exploratory data analysis of the Sesame Street study revealed very promising leads for modeling as well as some concerns about possible data issues and confounders we will have to watch out for in the modeling stage. On the whole, it appeared that Sesame Street viewership was positively correlated with greater improvement as measured by PAG and percent increase across all tests (letters, forms, and numbers). The comparative improvement across tests did not appear to have a clear trend measured by both PAG and percent increase.
+Our exploratory data analysis of the Sesame Street study revealed promising leads for modeling, as well as concerns about possible data issues and confounders we will have to watch out for as we move forward. As a whole, it appeared that Sesame Street viewership was positively correlated with greater improvement, as measured by PAG and percent increase across all tests (letters, forms, and numbers). The comparative improvement across tests did not appear to have a clear trend measured by both PAG and percent increase.
 
-While PAG is has nice theoretical properties, its use as a response variable in this study may not be practical as it introduced a lot more nonuniform variability in the outcomes. In addition, exploratory analysis revealed that variance may not be equal across all groups (particularly with regards to site), and this could cause possible problems in modeling. More in-depth exploratory analysis is reported below. First, we look at visualizations to answer the two primary research questions, then we investigate possible confounders. 
+While PAG is has nice theoretical properties, its use as a response variable in this study may not be practical; it introduced more nonuniform variability in the outcomes. In addition, exploratory analysis revealed that variance may not be equal across all groups (particularly with regards to site), and this could cause possible problems in modeling. More in-depth exploratory analysis is reported below. First, we look at visualizations to answer the two primary research questions; then, we investigate possible confounders. 
 
 ```{r}
 #| label: fig-LNF1
@@ -152,11 +153,11 @@ plot <- ggplot(longData, aes(x=which_test, y=diff_pct, fill=which_test)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") + 
   ylab("Percent Increase") +
-  labs(title = "Percent Increase Gain by Test") 
+  labs(title = "Percent Increase by Test") 
 plot
 
 ```
-The plot in @fig-LNF3 doesn't indicate a very clear trend with regards to which subject Sesame Street teaches the most effectively. The highest median is forms, followed by numbers and then letters. However, all three boxplots have significant overlap with each other, which means that statistical analysis probably will not find significant differences. 
+The plot in @fig-LNF3 doesn't indicate a clear trend with regards to which subject Sesame Street teaches the most effectively. The highest median is forms, followed by numbers and then letters. However, all three boxplots have significant overlap with each other, which means that statistical analysis will likely not yield usable differences. 
 
 ```{r}
 #| label: fig-LNF4
@@ -170,12 +171,12 @@ plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") + 
   ylab("PAG") +
-  labs(title = "Percent Achievable Gain by Test") 
+  labs(title = "Percent Achievable Gain (PAG) by Test") 
 plot
 
 ```
 
-Once again it appears that PAG introduces a lot of additional variance compared to the same plot using percent increase as the response variable. In this case, there is clearly significant right-skew in the data with lots of outliers. Despite this, the plot in @fig-LNF4 does appear to identify similar results as the plot in @fig-LNF3. 
+Once again, it appears that PAG introduces a lot of additional variance compared to the same plot using percent increase as the response variable. In this case, there is clearly significant left-skew in the data with lots of outliers. Despite this, the plot in @fig-LNF4 does appear to show similar results as the plot in @fig-LNF3. When put on the same scale, the values appear to be similar around the middle of the boxplot.
 
 For simplicity, all investigation of possible confounders (below), was done with only percent increase as response variable. 
 ```{r}
