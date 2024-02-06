@@ -23,8 +23,7 @@ library(GGally)
 just_scores <- read.csv('test_scores.csv')
 subset_scores <- subset(just_scores, 
                         grepl('let', test_name) | 
-                        grepl('form', test_name) | 
-                        grepl('numb', test_name))
+                        grepl('form', test_name) | grepl('numb', test_name))
 
 subset_scores <- subset_scores |> 
   mutate(which_test = case_when(grepl('let', test_name) ~ 'letters',
@@ -52,7 +51,6 @@ glimpse(Data)
 
 Comparing improvement (post-test - pre-test) based on viewcat (higher number = watched more)
 ```{r}
-
 plot <- ggplot(Data, aes(x = viewcat, y = let_diff, fill = viewcat)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("View Time (higher value=more)") + 
