@@ -20,10 +20,10 @@ library(GGally)
 
 ## Import Data
 ```{r}
-just_scores <- read.csv('test_scores.csv')
-subset_scores <- subset(just_scores, 
-                        grepl('let', test_name) | 
-                        grepl('form', test_name) | grepl('numb', test_name))
+# just_scores <- read.csv('test_scores.csv')
+# subset_scores <- subset(just_scores, 
+#                         grepl('let', test_name) | 
+#                         grepl('form', test_name) | grepl('numb', test_name))
 
 
 wideData <- read.csv('clean_df_wide.csv')
@@ -126,7 +126,7 @@ plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
   xlab("Which Test") + 
   ylab("Percent Increase") +
   labs(title = "Percent Increase by Test") 
-  ggsave("CategoriesBox.pngPAG", plot, width = 8, height = 6, dpi = 300)
+  ggsave("CategoriesBoxPAG.png", plot, width = 8, height = 6, dpi = 300)
 plot
 ```
 

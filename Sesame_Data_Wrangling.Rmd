@@ -109,9 +109,9 @@ final_df_long <- final_df_long |>
                values_to = 'diff_pct')
 
 final_df_long <- final_df_long |> 
-  mutate(which_test = case_when(grepl('let', whichPAG) ~ 'letters',
-                                grepl('form', whichPAG) ~ 'forms',
-                                grepl('numb', whichPAG) ~ 'numbers'))
+  mutate(which_test = case_when(grepl('let', which_diff_pct) ~ 'letters',
+                                grepl('form', which_diff_pct) ~ 'forms',
+                                grepl('numb', which_diff_pct) ~ 'numbers'))
 
 ```
 
