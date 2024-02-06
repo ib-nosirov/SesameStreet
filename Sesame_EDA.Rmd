@@ -26,25 +26,20 @@ subset_scores <- subset(just_scores,
                         grepl('form', test_name) | 
                         grepl('numb', test_name))
 
-subset_scores <- subset_scores |> 
-  mutate(which_test = case_when(grepl('let', test_name) ~ 'letters',
-                                grepl('form', test_name) ~ 'forms',
-                                grepl('numb', test_name) ~ 'numbers'))
 
-Data <- read.csv('clean_df.csv')
-
-Data <-  Data |> 
-  mutate(encour = case_when(encour == 0 ~ 'No',
-                            encour == 1 ~ 'Yes'))
+wideData <- read.csv('clean_df_wide.csv')
+longData <- read.csv('clean_df_long.csv')
 
 # make categorical variables categorical 
-Data$site <-  as.character(Data$site)
-Data$sex <-  as.character(Data$sex)
-Data$viewcat <-  as.character(Data$viewcat)
-Data$setting <-  as.character(Data$setting)
+wideData$site <-  as.character(wideData$site)
+wideData$viewcat <-  as.character(wideData$viewcat)
+wideData$setting <-  as.character(wideData$setting)
 
+longData$site <-  as.character(longData$site)
+longData$viewcat <-  as.character(longData$viewcat)
+longData$setting <-  as.character(longData$setting)
 
-glimpse(Data)
+glimpse(wideData)
 ```
 
 
@@ -53,70 +48,57 @@ glimpse(Data)
 Comparing improvement (post-test - pre-test) based on viewcat (higher number = watched more)
 ```{r}
 
-plot <- ggplot(Data, aes(x = viewcat, y = let_diff, fill = viewcat)) +
+plot <- ggplot(wideData, aes(x = viewcat, y = letPAG, fill = viewcat)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("View Time (higher value=more)") + 
-  ylab("Improvement") + 
-  labs(title = "Letters") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("boxLetters.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+  ggsave("boxLettersPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
-plot <- ggplot(Data, aes(x = viewcat, y = numb_diff, fill = viewcat)) +
+plot <- ggplot(wideData, aes(x = viewcat, y = numbPAG, fill = viewcat)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("View Time") + 
-  ylab("Improvement") + 
-  labs(title = "Numbers") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("boxNumbers.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Numbers") 
+  ggsave("boxNumbersPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
-plot <- ggplot(Data, aes(x = viewcat, y = form_diff, fill = viewcat)) +
+plot <- ggplot(wideData, aes(x = viewcat, y = formPAG, fill = viewcat)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("View Time") + 
-  ylab("Improvement") + 
-  labs(title = "Forms") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("boxForms.png", plot, width = 8, height = 6, dpi = 300)
-
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+  ggsave("boxFormsPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 ```
 
 Comparing improvement (post-test - pre-test) based on encouragement (1 = was encouraged)
 ```{r}
 
-plot <- ggplot(Data, aes(x = encour, y = let_diff, fill = encour)) +
+plot <- ggplot(wideData, aes(x = encour, y = letPAG, fill = encour)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("Encouragement") + 
-  ylab("Improvement") + 
-  labs(title = "Letters") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("boxLetters.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+  ggsave("boxLettersPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
-plot <- ggplot(Data, aes(x = encour, y = numb_diff, fill = encour)) +
+plot <- ggplot(wideData, aes(x = encour, y = numbPAG, fill = encour)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("Encouragement") + 
-  ylab("Improvement") + 
-  labs(title = "Numbers") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("boxNumbers.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Numbers")
+  ggsave("boxNumbersPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
-plot <- ggplot(Data, aes(x = encour, y = form_diff, fill = encour)) +
+plot <- ggplot(wideData, aes(x = encour, y = formPAG, fill = encour)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("Encouragement") + 
-  ylab("Improvement") + 
-  labs(title = "Forms") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("boxForms.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+  ggsave("boxFormsPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
 ```
 
@@ -124,106 +106,224 @@ plot <- ggplot(Data, aes(x = encour, y = form_diff, fill = encour)) +
 
 ## Research Question 2: What, if any, area should we focus on for improvement?  E.g. are we better at teaching letters than we are at numbers?
 ```{r}
-subset_scores$test_name <- factor(subset_scores$test_name,
-    levels = c('preform','postform', 'prelet', 'postlet', 'prenumb', 'postnumb'),ordered = TRUE)
+# subset_scores$test_name <- factor(subset_scores$test_name,
+#     levels = c('preform','postform', 'prelet', 'postlet', 'prenumb', 'postnumb'),ordered = TRUE)
 
 
-plot <- ggplot(subset_scores, aes(x=test_name, y=score, fill=which_test)) +
+# plot <- ggplot(subset_scores, aes(x=test_name, y=PAG, fill=which_test)) +
+#   geom_boxplot(show.legend=FALSE) +
+#   xlab("Which Test") + 
+#   ylab("Test Score") +
+#   labs(title = "Pre and Post Test Scores") +
+#   theme(axis.text=element_text(size=22),
+#         axis.title=element_text(size=30,face="bold"),
+#         axis.text.x = element_blank(),
+#         title=element_text(size=25,face="bold"))
+#   ggsave("PrePostBox.png", plot, width = 8, height = 6, dpi = 300)
+
+plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
   geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") + 
-  ylab("Test Score") +
-  labs(title = "Pre and Post Test Scores") +
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        axis.text.x = element_blank(),
-        title=element_text(size=25,face="bold"))
-  ggsave("PrePostBox.png", plot, width = 8, height = 6, dpi = 300)
-
-plot <- ggplot(subset_scores, aes(x=which_test, y=score, fill=which_test)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Which Test") + 
-  ylab("Test Score") +
-  labs(title = "Average Test Scores") + 
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("CategoriesBox.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") +
+  labs(title = "Percent Increase by Test") 
+  ggsave("CategoriesBox.pngPAG", plot, width = 8, height = 6, dpi = 300)
+plot
 ```
 
 
 ## Investigate some possible confounders
 
-Make long format dataframe for confounders
-```{r}
-
-long_Data <- subset_scores |>
-  left_join(Data, by = 'ID')
-
-```
-
-
 Sex vs avg test score
 ```{r}
-plot <- ggplot(long_Data, aes(x = which_test, y = score, fill = sex)) + 
+plot <- ggplot(longData, aes(x = which_test, y = PAG, fill = sex)) + 
   geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") +
-  ylab("Test Score") + 
-  labs(title = "Average Test Scores by Sex") +
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("GenderBox.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Sex") 
+  ggsave("GenderBoxPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
   
 
 ```
 
 Site vs avg test score
 ```{r}
-plot <- ggplot(long_Data, aes(x = which_test, y = score, fill = site)) + 
+plot <- ggplot(longData, aes(x = which_test, y = PAG, fill = site)) + 
   geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") +
-  ylab("Test Score") + 
-  labs(title = "Average Test Scores by Site") +
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"))
-  ggsave("SiteBox.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Site") 
+  ggsave("SiteBoxPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
 ```
 
 Age vs avg test score
 ```{r}
-plot <- ggplot(long_Data, aes(x = age, y = score, col = which_test)) + 
+plot <- ggplot(longData, aes(x = age, y = PAG, col = which_test)) + 
   geom_point() +
   xlab("Age") +
-  ylab("Test Score") + 
-  labs(title = "Average Test scores by Age", col = "Which Test") +
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"),
-        legend.text =element_text(size = 25, face = "bold"))
-  ggsave("AgeScatter.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Age", col = "Which Test") 
+  ggsave("AgeScatterPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot 
+
 ```
 
 Setting vs avg test score
 ```{r}
 
-plot <- ggplot(long_Data, aes(x = which_test, y = score, fill = setting)) + 
+plot <- ggplot(longData, aes(x = which_test, y = PAG, fill = setting)) + 
   geom_boxplot(show.legend=FALSE) +
   xlab("Which Test") +
-  ylab("Test Score") + 
-  labs(title = "Test scores by Setting") +
-  theme(axis.text=element_text(size=22),
-        axis.title=element_text(size=30,face="bold"),
-        title=element_text(size=25,face="bold"),
-        legend.text =element_text(size = 25, face = "bold"))
-  ggsave("SettingBox.png", plot, width = 8, height = 6, dpi = 300)
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Setting") 
+  ggsave("SettingBoxPAG.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+```
+
+
+## Do it all again but with pct diff
+
+
+## Research Question 1: Does our programming improve children’s knowledge of letters, numbers, and forms?
+
+Comparing improvement (post-test - pre-test) based on viewcat (higher number = watched more)
+```{r}
+
+plot <- ggplot(wideData, aes(x = viewcat, y = let_diff_pct, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time (higher value=more)") + 
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+  ggsave("boxLettersPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = numb_diff_pct, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Numbers") 
+  ggsave("boxNumbersPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = form_diff_pct, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+  ggsave("boxFormsPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+```
+
+Comparing improvement (post-test - pre-test) based on encouragement (1 = was encouraged)
+```{r}
+
+plot <- ggplot(wideData, aes(x = encour, y = let_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+  ggsave("boxLettersPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+plot <- ggplot(wideData, aes(x = encour, y = numb_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Numbers")
+  ggsave("boxNumbersPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+plot <- ggplot(wideData, aes(x = encour, y = form_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+  ggsave("boxFormsPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
 
 ```
 
 
 
+## Research Question 2: What, if any, area should we focus on for improvement?  E.g. are we better at teaching letters than we are at numbers?
+```{r}
+# subset_scores$test_name <- factor(subset_scores$test_name,
+#     levels = c('preform','postform', 'prelet', 'postlet', 'prenumb', 'postnumb'),ordered = TRUE)
 
+
+# plot <- ggplot(subset_scores, aes(x=test_name, y=diff_pct, fill=which_test)) +
+#   geom_boxplot(show.legend=FALSE) +
+#   xlab("Which Test") +
+#   ylab("Test Score") +
+#   labs(title = "Pre and Post Test Scores") +
+#   ggsave("PrePostBoxPCT.png", plot, width = 8, height = 6, dpi = 300)
+
+plot <- ggplot(longData, aes(x=which_test, y=diff_pct, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") + 
+  ylab("Percent Increase") +
+  labs(title = "Percent Increase by Test") 
+  ggsave("CategoriesBoxPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+```
+
+
+## Investigate some possible confounders
+
+
+
+Sex vs avg test score
+```{r}
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = sex)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Sex") 
+  ggsave("GenderBoxPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+  
+
+```
+
+Site vs avg test score
+```{r}
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = site)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Site") 
+  ggsave("SiteBoxPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+```
+
+Age vs avg test score
+```{r}
+plot <- ggplot(longData, aes(x = age, y = diff_pct, col = which_test)) + 
+  geom_point() +
+  xlab("Age") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Age", col = "Which Test") 
+  ggsave("AgeScatterPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot 
+
+```
+
+Setting vs avg test score
+```{r}
+
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = setting)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Setting") 
+  ggsave("SettingBoxPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+```
 
 
 
