@@ -215,6 +215,13 @@ plot <- ggplot(wideData, aes(x = viewcat, y = form_diff_pct, fill = viewcat)) +
   labs(title = "Forms") 
   ggsave("boxFormsPCT.png", plot, width = 8, height = 6, dpi = 300)
 plot
+
+plot <- ggplot(longData, aes(x=which_test, y = diff_pct, fill = viewcat)) + 
+  geom_boxplot(show.legend=TRUE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Score Increase with Vewership by Subject") 
+plot
 ```
 
 Comparing improvement (post-test - pre-test) based on encouragement (1 = was encouraged)
