@@ -1,0 +1,86 @@
+---
+title: "Analysis"
+author: "Armelle Duston"
+date: "2024-02-07"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libaries
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(leaps)
+library(emmeans)
+library(lme4)
+
+```
+
+## Import Data
+```{r}
+
+wideData <- read.csv('clean_df_wide.csv')
+longData <- read.csv('clean_df_long.csv')
+
+# make categorical variables categorical 
+wideData$site <-  as.character(wideData$site)
+wideData$viewcat <-  as.character(wideData$viewcat)
+wideData$setting <-  as.character(wideData$setting)
+
+longData$site <-  as.character(longData$site)
+longData$viewcat <-  as.character(longData$viewcat)
+longData$setting <-  as.character(longData$setting)
+
+subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody', 'let_diff_pct')]
+subset_form <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody','form_diff_pct')]
+subset_numb <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody','numb_diff_pct')]
+
+  
+```
+
+## Try some linear models
+```{r}
+
+let_fit0 <- lm(let_diff_pct ~ . , data = subset_let)
+form_fit0 <- lm(form_diff_pct ~ . , data = subset_form)
+numb_fit0 <- lm(numb_diff_pct ~ . , data = subset_numb)
+
+step(let_fit0, trace = FALSE)
+step(form_fit0, trace = FALSE)
+step(numb_fit0, trace = FALSE)
+
+```
+
+
+## Anova
+```{r}
+let_anova <- lm(let_diff_pct ~ site + viewcat + encour, data = subset_let)
+form_anova <- lm(form_diff_pct ~ viewcat + peabody , data = subset_form)
+numb_anova <- lm(numb_diff_pct ~ viewcat + peabody*site , data = subset_numb)
+
+summary(let_anova)
+summary(form_anova)
+summary(numb_anova)
+
+# plot(let_anova)
+# plot(form_anova)
+# plot(numb_anova)
+```
+
+Which test does the best?
+```{r}
+
+fit2 <- lm(diff_pct ~ which_test, data = longData)
+summary(fit2)
+```
+
+Mixed effects model??
+```{r}
+mixed_model <- lmer(diff_pct ~ which_test + viewcat + (1|ID), data = longData)
+summary(mixed_model)
+```
+
