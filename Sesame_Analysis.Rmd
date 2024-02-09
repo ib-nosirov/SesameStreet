@@ -17,6 +17,7 @@ library(GGally)
 library(leaps)
 library(emmeans)
 library(lme4)
+library(car)
 
 ```
 
@@ -60,11 +61,11 @@ step(numb_fit0, trace = FALSE)
 ```{r}
 let_anova <- lm(let_diff_pct ~ site + viewcat + encour, data = subset_let)
 form_anova <- lm(form_diff_pct ~ viewcat + peabody , data = subset_form)
-numb_anova <- lm(numb_diff_pct ~ viewcat + peabody*site , data = subset_numb)
+numb_anova <- lm(numb_diff_pct ~ viewcat + site + peabody, data = subset_numb)
 
-summary(let_anova)
-summary(form_anova)
-summary(numb_anova)
+Anova(let_anova, type="II")
+Anova(form_anova, type="II")
+Anova(numb_anova, type="II")
 
 # plot(let_anova)
 # plot(form_anova)
