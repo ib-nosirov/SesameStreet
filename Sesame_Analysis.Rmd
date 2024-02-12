@@ -80,12 +80,12 @@ plot(form_means, comparisons=T)
 numb_means <- emmeans(numb_lm, ~viewcat, adjust = 'HSD')
 plot(numb_means, comparisons=T)
 
-# par(mfrow=c(2,2))
-# plot(let_lm)
-# par(mfrow=c(2,2))
-# plot(form_lm)
-# par(mfrow=c(2,2))
-# plot(numb_lm)
+par(mfrow=c(2,2))
+plot(let_lm)
+par(mfrow=c(2,2))
+plot(form_lm)
+par(mfrow=c(2,2))
+plot(numb_lm)
 
 ```
 
@@ -110,10 +110,14 @@ plot(fit2)
 
 ```
 
-Mixed effects model?? - I don't think we should use this
+Mixed effects model for which test is best?
 ```{r}
 mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID), data = longData)
 Anova(mixed_model)
+
+mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
+plot(mixed_model_means, comparisons=T)
+
 
 ```
 
