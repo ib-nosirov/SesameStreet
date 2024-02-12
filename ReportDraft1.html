@@ -36,6 +36,35 @@ ul.task-list li input[type="checkbox"] {
 <link href="ReportDraft1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="ReportDraft1_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -163,8 +192,8 @@ Table&nbsp;1: Summary of variables used in analysis
 </div>
 </div>
 </section>
-<section id="exploratory-data-analysis-eda" class="level1">
-<h1>2. Exploratory Data Analysis (EDA)</h1>
+<section id="exploratory-data-analysis-eda" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-eda">2. Exploratory Data Analysis (EDA)</h2>
 <p>Our exploratory data analysis of the Sesame Street study revealed promising leads for modeling, as well as concerns about possible data issues and confounders we will have to watch out for as we move forward. As a whole, it appeared that Sesame Street viewership was positively correlated with greater improvement, as measured by PAG and percent increase across all tests (letters, forms, and numbers). The comparative improvement across tests did not appear to have a clear trend measured by both PAG and percent increase.</p>
 <p>While PAG is has nice theoretical properties, its use as a response variable in this study may not be practical; it introduced more nonuniform variability in the outcomes. In addition, exploratory analysis revealed that variance may not be equal across all groups (particularly with regards to site), and this could cause possible problems in modeling. More in-depth exploratory analysis is reported below. First, we look at visualizations to answer the two primary research questions; then, we investigate possible confounders.</p>
 <div id="fig-LNF1" class="quarto-layout-panel">
@@ -432,6 +461,261 @@ Figure&nbsp;9: Comparing Percent Increase Across Three Subjects (Letters, Number
 </div>
 </div>
 <p>The plot in <a href="#fig-Setting" class="quarto-xref">Figure&nbsp;9</a> seems to show little to no relationship between setting and percent increase in score in any of the tests. It does not appear that setting will be an important confounder to consider in modeling.</p>
+</section>
+<section id="statistical-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-analysis">3. Statistical Analysis</h2>
+<p><em>Describe statistical analysis in terms that your client will be able to understand and perhaps use in presenting their own research. This section should summarize all relevant analyses that lead to your final conclusions/decisions/recommendations, but should NEVER include visible code (folded code chunks are fine) or unformatted software output.</em></p>
+<ul>
+<li><em>Model Assumptions &amp; how checked/verified (details left to appendix)</em></li>
+<li><em>Interpretation of estimates/statistics/p-values IN CONTEXT</em></li>
+<li><em>Enough detail that the model/analysis could be reproduced by another statistician</em></li>
+</ul>
+<p>site + age + viewcat + prelet</p>
+<p>To address the first research question, we fit three multiple linear regression models: one for each subject. The models were all of the form: <span class="math display">\[\text{Improvement} = \beta_0 + \beta_1\text{prescore} + \beta_2\text{age} + \beta_3I_{viewcat_2}+ \dots + \beta_5I_{viewcat_4} + \beta_6I_{site_2} + \dots + \beta_9I_{site_5} + \epsilon, \\ \epsilon\sim N(0,\sigma).\]</span> In this model, <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> are attached to the two quantitative variables, and they signify the change in predicted improvement given a unit increase in prescore and age, respectively. The other <span class="math inline">\(\beta\)</span>’s (3 through 9) are attached to the two categorical variables, viewcat and site. The interpretation of <span class="math inline">\(\beta_3\)</span> is the change in predicted improvement for viewcat 2 when compared to viewcat 1 (the baseline), and this interpretation extends through to <span class="math inline">\(\beta_5\)</span>. Similarly, the interpretation of <span class="math inline">\(\beta_6\)</span> is the change in predicted improvement for site 2 when compared to site 1 (the baseline), and this interpretation extends through to <span class="math inline">\(\beta_9\)</span>. A (type II) ANOVA table for each model is included in <a href="#tbl-anova-1" class="quarto-xref">Table&nbsp;2</a>, <a href="#tbl-anova-2" class="quarto-xref">Table&nbsp;3</a>, and <a href="#tbl-anova-3" class="quarto-xref">Table&nbsp;4</a>.</p>
+<div class="cell">
+<div id="tbl-anova-1" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-anova-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: ANOVA table for multiple linear regression model to predict improvement in letters using viewcat, prescore, age, and site
+</figcaption>
+<div aria-describedby="tbl-anova-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Sum Sq</th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">F value</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">site</td>
+<td style="text-align: right;">1.3563322</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">15.290852</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.1705559</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7.691167</td>
+<td style="text-align: right;">0.0060044</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewcat</td>
+<td style="text-align: right;">1.4749363</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">22.170609</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">prelet</td>
+<td style="text-align: right;">0.5921747</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">26.703946</td>
+<td style="text-align: right;">0.0000005</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Residuals</td>
+<td style="text-align: right;">5.1003764</td>
+<td style="text-align: right;">230</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>In this table the values that we are most interested in are the p-values on the right-hand column. Although some values appear to be zero, they are not, but are so small that they were rounded to zero. We will consider any p-value less than 0.05 to be “significant,” meaning we can infer that what we observe is a product of the true process and not random chance. For the quantitative variables of age and prescore, the small p-values indicate that each of these variables is important for predicting improvement. For the categorical variables of viewcat and site, the small p-values indicate that at least one of the viewing categories and at least one of the sites resulted in a different improvement than another. The same interpretations can be applied to the two ANOVA tables below, which are analogous to this one but for the forms and numbers models.</p>
+<div class="cell">
+<div id="tbl-anova-2" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-anova-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: ANOVA table for multiple linear regression model to predict improvement in forms using viewcat, prescore, age, and site
+</figcaption>
+<div aria-describedby="tbl-anova-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Sum Sq</th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">F value</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">site</td>
+<td style="text-align: right;">0.3762414</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4.141300</td>
+<td style="text-align: right;">0.0029334</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.1730415</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7.618692</td>
+<td style="text-align: right;">0.0062423</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewcat</td>
+<td style="text-align: right;">0.9975679</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">14.640345</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">preform</td>
+<td style="text-align: right;">2.6819266</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">118.080169</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Residuals</td>
+<td style="text-align: right;">5.2239349</td>
+<td style="text-align: right;">230</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-anova-3" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-anova-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: ANOVA table for multiple linear regression model to predict improvement in numbers using viewcat, prescore, age, and site
+</figcaption>
+<div aria-describedby="tbl-anova-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Sum Sq</th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">F value</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">site</td>
+<td style="text-align: right;">0.4052706</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3.943926</td>
+<td style="text-align: right;">0.0040742</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.1522685</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5.927256</td>
+<td style="text-align: right;">0.0156704</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewcat</td>
+<td style="text-align: right;">0.7486290</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">9.713796</td>
+<td style="text-align: right;">0.0000046</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">prenumb</td>
+<td style="text-align: right;">0.9852310</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">38.351439</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Residuals</td>
+<td style="text-align: right;">5.9085953</td>
+<td style="text-align: right;">230</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>In <a href="#fig-pairwise-let" class="quarto-xref">Figure&nbsp;10</a>, we can observe the confidence intervals for the mean improvement in letters stratified by category after accounting for pretest score, age, and site. In this plot, if the red arrows for two confidence intervals don’t overlap, than we can infer that those two categories are statistically different from each other. In this case, we can see that viewing category 4 was associated with greater improvements than categories 1 and 2, but similar amounts of improvement as category 3 given a particular site, pre-score, and age. Similarly, given a particular site, pre-score, and age, viewing category 3 was associated with greater improvements than categories 1 and 2 and viewing category 2 was associated with greater improvements than category 1.</p>
+<div>
+
+</div>
+<div class="cell quarto-layout-panel" data-layout-ncol="1">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-pairwise-let" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pairwise-let-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="ReportDraft1_files/figure-html/fig-pairwise-let-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pairwise-let-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Mean Improvement in Letters by Viewing Category after accounting for site, age, and prescore
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>In <a href="#fig-pairwise-form" class="quarto-xref">Figure&nbsp;11</a>, we can observe the confidence intervals for the mean improvement in forms stratified by category after accounting for pretest score, age, and site. This plot can be interpreted in the same way as the one for letters, and we can observe similar trends.</p>
+<div>
+
+</div>
+<div class="cell quarto-layout-panel" data-layout-ncol="1">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-pairwise-form" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pairwise-form-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="ReportDraft1_files/figure-html/fig-pairwise-form-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pairwise-form-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Mean Improvement in Forms by Viewing Category after accounting for site, age, and prescore
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>Likewise, in <a href="#fig-pairwise-numb" class="quarto-xref">Figure&nbsp;12</a>, we can observe the confidence intervals for the mean improvement in numbers stratified by category after accounting for pretest score, age, and site. Once again, the same interpretations can be applied and the trend is similar to the other two.</p>
+<div>
+
+</div>
+<div class="cell quarto-layout-panel" data-layout-ncol="1" data-layout-align="center">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<div id="fig-pairwise-numb" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pairwise-numb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="ReportDraft1_files/figure-html/fig-pairwise-numb-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pairwise-numb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Mean Improvement in Numbers by Viewing Category after accounting for site, age, and prescore
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
 </section>
 
 </main>

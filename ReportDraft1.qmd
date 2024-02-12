@@ -18,6 +18,10 @@ options(ggplot2.discrete.fill=c("palevioletred2","darkseagreen2","cadetblue1","s
 # packages
 library(tidyverse) 
 library(tinytex)
+library(leaps)
+library(emmeans)
+library(lme4)
+library(car)
 
 # Read in data
 
@@ -287,11 +291,127 @@ The plot in @fig-Setting seems to show little to no relationship between setting
 
 ## 3. Statistical Analysis 
 
-*Describe statistical analysis in terms that your client will be able to understand and perhaps use in presenting their own research.  This section should summarize all relevant analyses that lead to your final conclusions/decisions/recommendations, but should NEVER include visible code (folded code chunks are fine) or unformatted software output.*
+To address the first research question, we fit three multiple linear regression models: one for each subject. The models predicted improvement using prescore, age, viewcat, and site. The models were all of the form:
+$$\text{SubjectImprovement} = \beta_0 + \beta_1\text{Prescore} + \beta_2\text{Age} + \beta_{3 \dots 5}I_{Viewcat}+ \beta_{6\dots9}I_{Site} + \epsilon,$$ 
+$$\epsilon\sim N(0,\sigma).$$
+In this model, $\beta_1$ and $\beta_2$ are attached to the two quantitative variables, and they signify the change in predicted improvement given a unit increase in prescore and age, respectively. The other $\beta$'s (3 through 9) are attached to the two categorical variables, viewcat and site. The interpretation of $\beta_3$ is the change in predicted improvement for viewcat 2 when compared to viewcat 1 (the baseline), and this interpretation extends through to $\beta_5$. Similarly, the interpretation of $\beta_6$ is the change in predicted improvement for site 2 when compared to site 1 (the baseline), and this interpretation extends through to $\beta_9$. Finally, $\beta0$ is the intercept, and its interpretation is not important in this context. A (type II) ANOVA table for each model is included in @tbl-anova-1, @tbl-anova-2, and @tbl-anova-3. 
 
-- *Model Assumptions & how checked/verified (details left to appendix)*
-- *Interpretation of estimates/statistics/p-values IN CONTEXT*
-- *Enough detail that the model/analysis could be reproduced by another statistician*
+```{r}
+#| label: tbl-anova-1
+#| warning: false
+#| echo: false
+#| tbl-cap: "ANOVA table for multiple linear regression model to predict improvement in letters using viewcat, prescore, age, and site"
+
+subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody', 'prelet', 'let_diff_pct')]
+
+let_lm <- lm(let_diff_pct ~ site + age + viewcat + prelet, data = subset_let)
+
+knitr::kable(Anova(let_lm))
+```
+
+In this table the values that we are most interested in are the p-values on the right-hand column. Although some values appear to be zero, they are not, but are so small that they were rounded to zero. We will consider any p-value less than 0.05 to be "significant," meaning we can infer that what we observe is a product of the true process and not random chance. For the quantitative variables of age and prescore, the small p-values indicate that each of these variables is important for predicting improvement. For the categorical variables of viewcat and site, the small p-values indicate that at least one of the viewing categories and at least one of the sites resulted in a different improvement than another. The same interpretations can be applied to the two ANOVA tables below, which are analogous to this one but for the forms and numbers models. 
+
+```{r}
+#| label: tbl-anova-2
+#| warning: false
+#| echo: false
+#| tbl-cap: "ANOVA table for multiple linear regression model to predict improvement in forms using viewcat, prescore, age, and site"
+
+subset_form <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'preform', 'peabody','form_diff_pct')]
+
+form_lm <- lm(form_diff_pct ~ site + age + viewcat + preform , data = subset_form)
+
+knitr::kable(Anova(form_lm))
+```
+
+```{r}
+#| label: tbl-anova-3
+#| warning: false
+#| echo: false
+#| tbl-cap: "ANOVA table for multiple linear regression model to predict improvement in numbers using viewcat, prescore, age, and site"
+
+subset_numb <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'prenumb', 'peabody','numb_diff_pct')]
+
+numb_lm <- lm(numb_diff_pct ~ site + age + viewcat + prenumb, data = subset_numb)
+
+knitr::kable(Anova(numb_lm))
+```
+
+In @fig-pairwise-let, we can observe the confidence intervals for the mean improvement in letters stratified by category after accounting for pretest score, age, and site. In this plot, if the red arrows for two confidence intervals don't overlap, than we can infer that those two categories are statistically different from each other. In this case, we can see that viewing category 4 was associated with greater improvements than categories 1 and 2, but similar amounts of improvement as category 3 given a particular site, pre-score, and age. Similarly, given a particular site, pre-score, and age, viewing category 3 was associated with greater improvements than categories 1 and 2 and viewing category 2 was associated with greater improvements than category 1.
+
+```{r}
+#| label: fig-pairwise-let
+#| echo: false
+#| warning: false
+#| fig-cap: "Mean Improvement in Letters by Viewing Category after accounting for site, age, and prescore "
+#| layout-ncol: 1
+
+let_means <- emmeans(let_lm, ~viewcat, adjust = 'HSD')
+plot(let_means, comparisons=T, xlab = 'Mean Improvement', ylab = 'Viewing Category', main = "Mean Improvement in Letters by Viewing Category after accounting for site, age, and prescore")
+
+
+```
+
+In @fig-pairwise-form, we can observe the confidence intervals for the mean improvement in forms stratified by category after accounting for pretest score, age, and site. This plot can be interpreted in the same way as the one for letters, and we can observe similar trends. 
+
+```{r}
+#| label: fig-pairwise-form
+#| echo: false
+#| warning: false
+#| fig-cap: "Mean Improvement in Forms by Viewing Category after accounting for site, age, and prescore"
+#| layout-ncol: 1
+
+form_means <- emmeans(form_lm, ~viewcat, adjust = 'HSD')
+plot(form_means, comparisons=T, xlab = 'Mean Improvement', ylab = 'Viewing Category')
+
+```
+
+Likewise, in @fig-pairwise-numb, we can observe the confidence intervals for the mean improvement in numbers stratified by category after accounting for pretest score, age, and
+site. Once again, the same interpretations can be applied and the trend is similar to the other two. 
+
+```{r}
+#| label: fig-pairwise-numb
+#| echo: false
+#| warning: false
+#| fig-cap: "Mean Improvement in Numbers by Viewing Category after accounting for site, age, and prescore "
+#| fig-align: "center"
+#| layout-ncol: 1
+
+numb_means <- emmeans(numb_lm, ~viewcat, adjust = 'HSD')
+plot(numb_means, comparisons=T, xlab = 'Mean Improvement', ylab = 'Viewing Category')
+
+```
+
+To address the second research question, we fit a mixed-effects linear model predicting improvement with subject, age, viewcat, site, and an interaction term between subject and viewcat while accounting for the random effects of the individual child (in the model, we call the random effect ID). The mathematical form of this model is:
+$$\text{Improvement} = \beta_0 + \beta_1\text{Age} + \beta_{2,3}I_{Subject} + \beta_{4\dots6}I_{Viewcat} + \beta_{7 \dots 10}I_{Site} + \beta_{11 \dots 16}I_{Viewcat}I_{Site} + \gamma ID + \epsilon,$$ 
+$$\epsilon\sim N(0,\sigma).$$
+
+The interpretations of $\beta0$ to $\beta10$ work the same as they did in the previous model. However, in this model we also include an interaction term and a random effects term. The interaction term 
+
+```{r}
+
+mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID), data = longData)
+Anova(mixed_model)
+summary(mixed_model)
+
+mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
+plot(mixed_model_means, comparisons=T)
+
+
+#likelihood ratio test to see if mixed model is needed
+unmixed_model <- lm(diff_pct ~ which_test*viewcat + site, data=longData)
+
+G2 = -2 * logLik(unmixed_model) + 2 * logLik(mixed_model)
+pchisq(as.numeric(G2), df=1, lower.tail=F)
+
+```
+
+
+
+
+
+
+
 
 
 
