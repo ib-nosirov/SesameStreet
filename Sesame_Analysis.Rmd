@@ -36,9 +36,9 @@ longData$site <-  as.character(longData$site)
 longData$viewcat <-  as.character(longData$viewcat)
 longData$setting <-  as.character(longData$setting)
 
-subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody', 'let_diff_pct')]
-subset_form <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody','form_diff_pct')]
-subset_numb <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody','numb_diff_pct')]
+subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody', 'prelet', 'let_diff_pct')]
+subset_form <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'preform', 'peabody','form_diff_pct')]
+subset_numb <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'prenumb', 'peabody','numb_diff_pct')]
 
   
 ```
@@ -57,31 +57,63 @@ step(numb_fit0, trace = FALSE)
 ```
 
 
-## Anova
+## Linear Models
 ```{r}
-let_anova <- lm(let_diff_pct ~ site + viewcat + encour, data = subset_let)
-form_anova <- lm(form_diff_pct ~ viewcat + peabody , data = subset_form)
-numb_anova <- lm(numb_diff_pct ~ viewcat + site + peabody, data = subset_numb)
+let_lm <- lm(let_diff_pct ~ site + age + viewcat + prelet, data = subset_let)
+form_lm <- lm(form_diff_pct ~ site + age + viewcat + preform , data = subset_form)
+numb_lm <- lm(numb_diff_pct ~ site + age + viewcat + prenumb, data = subset_numb)
 
-Anova(let_anova, type="II")
-Anova(form_anova, type="II")
-Anova(numb_anova, type="II")
+Anova(let_lm)
+Anova(form_lm)
+Anova(numb_lm)
 
-# plot(let_anova)
-# plot(form_anova)
-# plot(numb_anova)
+# summary(let_lm)
+# summary(form_lm)
+# summary(numb_lm)
+
+let_means <- emmeans(let_lm, ~viewcat, adjust = 'HSD')
+plot(let_means, comparisons=T)
+
+form_means <- emmeans(form_lm, ~viewcat, adjust = 'HSD')
+plot(form_means, comparisons=T)
+
+numb_means <- emmeans(numb_lm, ~viewcat, adjust = 'HSD')
+plot(numb_means, comparisons=T)
+
+# par(mfrow=c(2,2))
+# plot(let_lm)
+# par(mfrow=c(2,2))
+# plot(form_lm)
+# par(mfrow=c(2,2))
+# plot(numb_lm)
+
 ```
+
 
 Which test does the best?
 ```{r}
-
-fit2 <- lm(diff_pct ~ which_test, data = longData)
+fit2 <- lm(diff_pct ~ which_test + site + viewcat, data = longData)
+Anova(fit2)
 summary(fit2)
+
+whichtest_means <- emmeans(fit2, ~which_test, adjust = 'HSD')
+plot(whichtest_means, comparisons=T)
+
+# viewcat_means <- emmeans(fit2, ~viewcat, adjust = 'HSD')
+# plot(viewcat_means, comparisons=T)
+# 
+# site_means <- emmeans(fit2, ~site, adjust = 'HSD')
+# plot(site_means, comparisons=T)
+
+par(mfrow=c(2,2))
+plot(fit2)
+
 ```
 
-Mixed effects model??
+Mixed effects model?? - I don't think we should use this
 ```{r}
-mixed_model <- lmer(diff_pct ~ which_test + viewcat + (1|ID), data = longData)
-summary(mixed_model)
+mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID), data = longData)
+Anova(mixed_model)
+
 ```
 

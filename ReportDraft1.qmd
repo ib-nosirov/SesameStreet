@@ -64,7 +64,7 @@ knitr::kable(variable.desc)
 ```
 
 
-#  2. Exploratory Data Analysis (EDA)
+## 2. Exploratory Data Analysis (EDA)
 
 Our exploratory data analysis of the Sesame Street study revealed promising leads for modeling, as well as concerns about possible data issues and confounders we will have to watch out for as we move forward. As a whole, it appeared that Sesame Street viewership was positively correlated with greater improvement, as measured by PAG and percent increase across all tests (letters, forms, and numbers). The comparative improvement across tests did not appear to have a clear trend measured by both PAG and percent increase.
 
@@ -283,4 +283,15 @@ plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = setting)) +
 plot
 ```
 The plot in @fig-Setting seems to show little to no relationship between setting and percent increase in score in any of the tests. It does not appear that setting will be an important confounder to consider in modeling.
+
+
+## 3. Statistical Analysis 
+
+*Describe statistical analysis in terms that your client will be able to understand and perhaps use in presenting their own research.  This section should summarize all relevant analyses that lead to your final conclusions/decisions/recommendations, but should NEVER include visible code (folded code chunks are fine) or unformatted software output.*
+
+- *Model Assumptions & how checked/verified (details left to appendix)*
+- *Interpretation of estimates/statistics/p-values IN CONTEXT*
+- *Enough detail that the model/analysis could be reproduced by another statistician*
+
+
 
