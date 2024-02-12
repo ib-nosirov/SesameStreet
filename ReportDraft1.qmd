@@ -1,0 +1,286 @@
+---
+title: "Sesame Street Report [Draft]"
+author: 'Armelle, Sara, Ibrohim'
+date: 'February 05, 2024'
+output: pdf_document
+---
+
+```{r}
+#| echo: false
+#| include: false
+#| label: front-matter
+#| warning: false
+# clean up & set default chunk options
+rm(list = ls())
+knitr::opts_chunk$set(echo = FALSE)
+options(ggplot2.discrete.fill=c("palevioletred2","darkseagreen2","cadetblue1","steelblue1","mediumpurple1"))
+
+# packages
+library(tidyverse) 
+library(tinytex)
+
+# Read in data
+
+wideData <- read.csv('clean_df_wide.csv')
+longData <- read.csv('clean_df_long.csv')
+
+# make categorical variables categorical 
+wideData$site <-  as.character(wideData$site)
+wideData$viewcat <-  as.character(wideData$viewcat)
+wideData$setting <-  as.character(wideData$setting)
+
+longData$site <-  as.character(longData$site)
+longData$viewcat <-  as.character(longData$viewcat)
+longData$setting <-  as.character(longData$setting)
+```
+
+## 1. Project Description
+
+The project involves an observational study designed to assess the impact of "Sesame Street" viewership on children's learning outcomes, particularly in letters, numbers, and forms. The study is in the analysis stage, examining existing data collected from children across five different sites in the United States. Variables observed include, but are not limited to, viewing frequency, setting, encouragement to watch, and pretest scores of vocabulary maturity (Peabody Picture Vocabulary Test). Its objective is to determine the show's effectiveness in educational content delivery and identify areas for improvement. Results will be used to enhance Sesame Street's educational focus and impact, as per the client's request for an upcoming board meeting presentation.
+
+## 1.1 Research Questions
+
+**Question 1:** How does viewership of Sesame Street influence children's learning outcomes - specifically in terms of letters, numbers, and forms knowledge - as measured by the percent increase in post-test scores compared to pre-test scores? Is this result consistent if we instead consider percent achievable gain (PAG)?
+
+**Question 2:** Which area, of letters, numbers, and forms, has the most room for improvement? Which should Sesame street focus on improving in the future?
+
+
+## 1.2 Variables
+
+We considered a variety of variables in our preliminary analysis of the Sesame Street study. The dataset contained several explanatory variables, but we chose to focus on viewing frequency (Viewcat) as our main explanatory variable; and site, sex, age, setting, and encouragement as possible confounding variables. The dataset contained pre- and post-test scores for six different domains, but we were only interested in scores for letters, numbers, and forms. We also defined two possible response variables: percent increase and percent achievable gain (PAG). The first, percent increase, is simply the difference between the posttest score and pretest score, as percentages. The second, PAG, is the child's improvement (post-test score minus pre-test score) divided by total possible improvement (maximum test score minus pretest score). The goal with this measure is to capture improvement while accounting for the fact that advanced students cannot improve as much as those who were not as advanced to begin with. All variables used in our analysis are summarized in the table below. Although there were other variables included in the dataset, we decided that these were the most important ones to answer our client's research questions.
+
+```{r}
+#| label: tbl-variables
+#| echo: false
+#| tbl-cap: "Summary of variables used in analysis"
+
+
+variable.desc <- data.frame(Name = c("ID", "Site", "Sex", "Age", "Viewcat", "Setting", "Viewenc", "PAG", "Percent Increase"))
+variable.desc$Type <- c("Numerical", "Categorical", "Categorical","Numerical","Categorical","Categorical","Categorical","Numerical", "Numerical")
+variable.desc$Notes <- c("Identifying numeric sequence","Five different sampling sites (Explanatory)","Male or Female (Explanatory)","Age in months (Explanatory)","Categorical 1-4 encoding amount of show child watched (Explanatory)","Home or School (Explanatory)","Whether or not child was encouraged to view show (Explanatory)","Percent Acheivable Gain (Response)", "The difference of post-score percent and pre-score percent (Response)")
+
+knitr::kable(variable.desc)
+
+```
+
+
+#  2. Exploratory Data Analysis (EDA)
+
+Our exploratory data analysis of the Sesame Street study revealed promising leads for modeling, as well as concerns about possible data issues and confounders we will have to watch out for as we move forward. As a whole, it appeared that Sesame Street viewership was positively correlated with greater improvement, as measured by PAG and percent increase across all tests (letters, forms, and numbers). The comparative improvement across tests did not appear to have a clear trend measured by both PAG and percent increase.
+
+While PAG is has nice theoretical properties, its use as a response variable in this study may not be practical; it introduced more nonuniform variability in the outcomes. In addition, exploratory analysis revealed that variance may not be equal across all groups (particularly with regards to site), and this could cause possible problems in modeling. More in-depth exploratory analysis is reported below. First, we look at visualizations to answer the two primary research questions; then, we investigate possible confounders. 
+
+```{r}
+#| label: fig-LNF1
+#| echo: false
+#| warning: false
+#| fig-cap: "The Relationship Between Viewing Time of Sesame Street Percent Score Increase for Letters, Numbers, and Forms. Note that viewing time is categorical with higher values corresponding to more time viewing Sesame Street"
+#| layout-ncol: 3
+#| fig-subcap:  
+#|   - "Letters"
+#|   - "Numbers"
+#|   - "Forms"
+
+
+plot <- ggplot(wideData, aes(x = viewcat, y = let_diff_pct, fill = viewcat)) +
+geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = numb_diff_pct, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Numbers") 
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = form_diff_pct, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+plot
+```
+
+All three plots in @fig-LNF1 appear to indicate a positive linear relationship between viewing time (categorized as levels 1-4) and percent score increase. Although the variability is not completely consistent across viewing levels, overall the data are relatively well-behaved. 
+
+```{r}
+#| label: fig-LNF2
+#| echo: false
+#| warning: false
+#| fig-cap: "The Relationship Between Viewing Time of Sesame Street PAG for Letters, Numbers, and Forms. Note that viewing time is categorical with higher values corresponding to more time viewing Sesame Street"
+#| layout-ncol: 3
+#| fig-subcap:  
+#|   - "Letters"
+#|   - "Numbers"
+#|   - "Forms"
+
+plot <- ggplot(wideData, aes(x = viewcat, y = letPAG, fill = viewcat)) +
+geom_boxplot(show.legend=FALSE) +
+  xlab("View Time (higher value=more)") + 
+  ylab("PAG") + 
+  labs(title = "Letters") 
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = numbPAG, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("PAG") + 
+  labs(title = "Numbers") 
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = formPAG, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("PAG") + 
+  labs(title = "Forms") 
+plot
+```
+
+Similar to @fig-LNF1, all three plots in @fig-LNF2 seem to indicate a positive relationship between viewing time and percent score increase. However, by comparison to the plots using percent increase as the response variable, the data have a much wider spread with many more outliers. This could pose some problems in future modeling. 
+
+```{r}
+#| label: fig-LNF3
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects: Letters, Numbers, and Forms"
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x=which_test, y=diff_pct, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") + 
+  ylab("Percent Increase") +
+  labs(title = "Percent Increase by Test") 
+plot
+
+```
+The plot in @fig-LNF3 doesn't indicate a clear trend with regards to which subject Sesame Street teaches the most effectively. The highest median is forms, followed by numbers and then letters. However, all three boxplots have significant overlap with each other, which means that statistical analysis will likely not yield usable differences. 
+
+```{r}
+#| label: fig-LNF4
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing PAG Across Three Subjects: Letters, Numbers, and Forms"
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") + 
+  ylab("PAG") +
+  labs(title = "Percent Achievable Gain (PAG) by Test") 
+plot
+
+```
+
+Once again, it appears that PAG introduces a lot of additional variance compared to the same plot using percent increase as the response variable. In this case, there is clearly significant left-skew in the data with lots of outliers. Despite this, the plot in @fig-LNF4 does appear to show similar results as the plot in @fig-LNF3. When put on the same scale, the values appear to be similar around the middle of the boxplot.
+
+For simplicity, all investigation of possible confounders (below), was done with only percent increase as response variable. 
+```{r}
+#| label: fig-Encour
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Encouragement "
+#| layout-ncol: 3
+#| fig-subcap:  
+#|   - "Letters"
+#|   - "Numbers"
+#|   - "Forms"
+
+plot <- ggplot(wideData, aes(x = encour, y = let_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+plot
+
+plot <- ggplot(wideData, aes(x = encour, y = numb_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Numbers")
+plot
+
+plot <- ggplot(wideData, aes(x = encour, y = form_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+plot
+
+```
+The plots in @fig-Encour have somewhat unclear results. Encouragement may have an impact on percent score increase, particularly for letters, but there is enough overlap of the boxplots in all three plots that more analysis is needed. This may be an important confounder to consider in modeling.
+
+```{r}
+#| label: fig-Sex
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Sex "
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = sex)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Sex")
+plot
+```
+The plot in @fig-Sex seems to show little to no relationship between sex and percent increase in score in any of the tests. It does not appear that sex will be an important confounder to consider in modeling. 
+
+```{r}
+#| label: fig-Site
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Site "
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = site)) + 
+  geom_boxplot() +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Site") 
+plot
+```
+
+The plot in @fig-Site shows some variation in score improvement across the different sites for all three tests. Not only is median percent increase in score different depending on the site, but the variability is not uniform across groups either. This variable seems to be an important confounder, and we will have to look out for issues with the non-uniform varibility. 
+
+```{r}
+#| label: fig-Age
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Age "
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x = age, y = diff_pct, col = which_test)) + 
+  geom_point() +
+  xlab("Age") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Age", col = "Which Test") 
+plot 
+```
+
+The plot in @fig-Age seems to show little to no relationship between age and percent increase in score in any of the tests. The points appear to be scattered more or less at random. It does not appear that age will be an important confounder to consider in modeling.
+
+```{r}
+#| label: fig-Setting
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Setting "
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = setting)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Setting") 
+plot
+```
+The plot in @fig-Setting seems to show little to no relationship between setting and percent increase in score in any of the tests. It does not appear that setting will be an important confounder to consider in modeling.
+

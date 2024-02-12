@@ -20,11 +20,10 @@ library(GGally)
 
 ## Import Data
 ```{r}
-just_scores <- read.csv('test_scores.csv')
-subset_scores <- subset(just_scores, 
-                        grepl('let', test_name) | 
-                        grepl('form', test_name) | 
-                        grepl('numb', test_name))
+# just_scores <- read.csv('test_scores.csv')
+# subset_scores <- subset(just_scores, 
+#                         grepl('let', test_name) | 
+#                         grepl('form', test_name) | grepl('numb', test_name))
 
 
 wideData <- read.csv('clean_df_wide.csv')
@@ -48,8 +47,9 @@ glimpse(wideData)
 Comparing improvement (post-test - pre-test) based on viewcat (higher number = watched more)
 ```{r}
 
+
 plot <- ggplot(wideData, aes(x = viewcat, y = letPAG, fill = viewcat)) +
-  geom_boxplot(show.legend=FALSE) +
+geom_boxplot(show.legend=FALSE) +
   xlab("View Time (higher value=more)") + 
   ylab("Percent Increase") + 
   labs(title = "Letters") 
@@ -126,7 +126,7 @@ plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
   xlab("Which Test") + 
   ylab("Percent Increase") +
   labs(title = "Percent Increase by Test") 
-  ggsave("CategoriesBox.pngPAG", plot, width = 8, height = 6, dpi = 300)
+  ggsave("CategoriesBoxPAG.png", plot, width = 8, height = 6, dpi = 300)
 plot
 ```
 
@@ -214,6 +214,13 @@ plot <- ggplot(wideData, aes(x = viewcat, y = form_diff_pct, fill = viewcat)) +
   ylab("Percent Increase") + 
   labs(title = "Forms") 
   ggsave("boxFormsPCT.png", plot, width = 8, height = 6, dpi = 300)
+plot
+
+plot <- ggplot(longData, aes(x=which_test, y = diff_pct, fill = viewcat)) + 
+  geom_boxplot(show.legend=TRUE) +
+  xlab("View Time") + 
+  ylab("Percent Increase") + 
+  labs(title = "Score Increase with Vewership by Subject") 
 plot
 ```
 
