@@ -585,9 +585,9 @@ mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
 plot(mixed_model_means, comparisons=T, xlab = 'Mean Improvement',
      ylab = 'Viewing Category')
 
-mixed_model_means
-
-effectsize(mixed_model)
+# mixed_model_means
+# 
+# effectsize(mixed_model)
 
 
 ```
