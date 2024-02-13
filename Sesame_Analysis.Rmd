@@ -85,6 +85,11 @@ numb_means <- emmeans(numb_lm, ~viewcat, adjust = 'HSD')
 numb_means
 plot(numb_means, comparisons=T)
 
+# make sure effect sizes are not tiny
+effectsize(let_lm)
+effectsize(form_lm)
+effectsize(numb_lm)
+
 par(mfrow=c(2,2))
 plot(let_lm)
 par(mfrow=c(2,2))
@@ -131,6 +136,9 @@ unmixed_model <- lm(diff_pct ~ which_test*viewcat + site, data=longData)
 
 G2 = -2 * logLik(unmixed_model) + 2 * logLik(mixed_model)
 pchisq(as.numeric(G2), df=1, lower.tail=F)
+
+# make sure effect sizes are not tiny
+effectsize(mixed_model)
 
 ```
 

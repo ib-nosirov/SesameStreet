@@ -27,6 +27,7 @@ library(leaps)
 library(emmeans)
 library(lme4)
 library(car)
+library(effectsize)
 ```
 
 ```{r}
@@ -517,7 +518,9 @@ plot(numb_means, comparisons=T, xlab = 'Mean Improvement',
      ylab = 'Viewing Category')
 ```
 
-### Research Question 2: Setup
+Effect size is a metric which tells us whether the statistical differences we find are large enough to be practically important. We calculated effect sizes with respect to viewing category for each model, and found that in all models, differences between viewing category were associated with a moderate or large effect sizes. 
+
+## Research Question 2: Setup
 
 To address the second research question, we fit a mixed-effects linear model
 predicting improvement with subject, age, viewcat, site, and an interaction
@@ -533,53 +536,60 @@ $$\epsilon\sim N(0,\sigma).$$
 The interpretations of $\beta_0$ to $\beta_{10}$ work the same as they did in
 the previous model. However, in this model we also include an interaction term
 and a random effects term. The interaction term considers the effect of viewcat
-(amount of time watched) in the presence of another variable, `which_test',
-denoting which test is being administered. This way, we are considering if
+(amount of time watched) in the presence of another variable, which_test,
+denoting which subject is being tested. This way, we are considering if
 watching more sesame street has a unique benefit on a particular subject.
-The Analysis of Deviance table provides the significance of each fixed effect
+The purpose of the random effects term is to account for the correlation between scores in different subjects for any particular child. That is, a child's score in letters is likely correlated with that child's score in forms and numbers. A (type II) ANOVA table for each model is included in @tbl-anova-4. 
+
+### Research Question 2: Analysis of Results
+
+The Analysis of Variance table provides the significance of each fixed effect
 and interaction term. Notably, the interaction term between which_test and
 viewcat is highly significant (p < 2.2e-16), indicating that the amount of time
 spent watching Sesame Street has a differential impact on the improvement
 scores across the different test subjects. The random effects component shows
 variability in the intercepts across individual children (ID), indicating that
 there is significant individual difference in improvement scores that is not
-explained by the fixed effects in the model. This justifies the use of a random
-effects model over a fixed effects model.
+explained by the fixed effects in the model. This is a good sign that a random effects model is necessary in this case. To further justify using random effects in our model, we conducted a likelihood ratio test comparing a model with and without random effects. The test resulted in a very low p-value (p < 2.2e-16), and so we confirmed that the random effects were necessary in this model. 
 
 ```{r}
+#| label: tbl-anova-4
+#| warning: false
+#| echo: false
+#| tbl-cap: "ANOVA table for mixed effects model to predict improvement in all subjects using viewcat, which_test (subject), age, and site"
+
 mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID),
 		    data = longData)
-Anova(mixed_model)
-summary(mixed_model)
 
-mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
-plot(mixed_model_means, comparisons=T)
-
-
-#likelihood ratio test to see if mixed model is needed
-unmixed_model <- lm(diff_pct ~ which_test*viewcat + site, data=longData)
-
-G2 = -2 * logLik(unmixed_model) + 2 * logLik(mixed_model)
-pchisq(as.numeric(G2), df=1, lower.tail=F)
+knitr::kable(Anova(mixed_model))
 ```
 
-### Research Question 2: Analysis of Results
-The fixed effects coefficients for which_test show that, on average, there were
-significant differences in improvement scores across the different areas
-tested, with letters and numbers showing negative estimates. This suggests that
-in comparison to forms (the reference category), these areas had lower
-improvement scores. The EMMeans plot visually indicates that the estimated
-means for improvement in each subject area at different levels of viewing time
-vary. The plot can help us identify which area has the lowest estimated means,
-signaling the most room for improvement. [However, without the actual EMMeans
-values, we cannot definitively state which area this is.] While statistical
-significance is evident, the effect sizes [not provided] would be necessary to
-assess the practical significance of the findings. Large effect sizes in areas
-with lower improvement scores would suggest meaningful opportunities for
-targeted educational interventions by Sesame Street. Given the significance of
-the interaction effects, Sesame Street should focus on the subject area that,
-when viewed more, shows the least improvement [e.g. min(viewcat1:whichtest -
-viewcat2:whichtest); visually, it looks like forms]. This area would benefit
-most from enhanced educational content.
+
+In @fig-pairwise-all, we can observe the confidence intervals for the mean
+improvement stratified by which_test (subject) and viewcat after accounting for age and site. The reason that this plot is stratified by both variables is because our model has an interaction term, and so these are conditional means rather than marginal means. This plot helps us to identify which area has the lowest estimated means, signaling the most room for improvement. Visually, we see that this trend is not the same across all viewing cateogories. In viewcat 1, letters has the lowest mean improvement. In viewcat 2, the trend is not so clear since the red arrows for numbers and letters overlap with each other, so either subject could plausibly have the lowest mean improvement. In viewcat's 3 and 4, we see that either of numbers or forms have the lowest mean improvement. Since Sesame Street cares most about the effect of watching their show, the important result here is for viewing categories 3 and 4, since children who watched less of the show will presumably have been less impacted by it. 
+
+We calculated effect sizes using Pearson's r statistic for this model with respect to the differences between the subjects, and we found that the differences between subjects had moderate effect sizes. 
+
+<!-- While statistical significance is evident, the effect sizes [not provided] would be necessary to assess the practical significance of the findings. Large effect sizes in areas with lower improvement scores would suggest meaningful opportunities for targeted educational interventions by Sesame Street. Given the significance of the interaction effects, Sesame Street should focus on the subject area that, when viewed more, shows the least improvement [e.g. min(viewcat1:whichtest - viewcat2:whichtest); visually, it looks like forms]. This area would benefit most from enhanced educational content. -->
+
+```{r}
+#| label: fig-pairwise-all
+#| echo: false
+#| warning: false
+#| fig-cap: "Improvement by Subject given viewcat after accounting for site and age"
+#| fig-align: "center"
+#| layout-ncol: 1
+
+
+mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
+plot(mixed_model_means, comparisons=T, xlab = 'Mean Improvement',
+     ylab = 'Viewing Category')
+
+mixed_model_means
+
+effectsize(mixed_model)
+
+
+```
 
 
