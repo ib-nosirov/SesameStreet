@@ -20,7 +20,6 @@ library(tidyverse)
 library(tinytex)
 
 # Read in data
-
 wideData <- read.csv('clean_df_wide.csv')
 longData <- read.csv('clean_df_long.csv')
 

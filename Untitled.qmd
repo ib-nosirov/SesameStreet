@@ -1,0 +1,76 @@
+---
+title: "Analysis"
+format: pdf
+editor: visual
+---
+
+```{r}
+## Import Data
+# just_scores <- read.csv('test_scores.csv')
+# subset_scores <- subset(just_scores, 
+#                         grepl('let', test_name) | 
+#                         grepl('form', test_name) | grepl('numb', test_name))
+library(ggplot2)
+
+wideData <- read.csv('clean_df_wide.csv')
+longData <- read.csv('clean_df_long.csv')
+
+# make categorical variables categorical 
+wideData$site <-  as.character(wideData$site)
+wideData$viewcat <-  as.character(wideData$viewcat)
+wideData$setting <-  as.character(wideData$setting)
+
+longData$site <-  as.character(longData$site)
+longData$viewcat <-  as.character(longData$viewcat)
+longData$setting <-  as.character(longData$setting)
+
+glimpse(wideData)
+
+```
+
+```{r}
+y <- scores_w_pct$let_diff_pct
+
+x <- wideData$viewcat
+
+lm(y ~ x)
+
+ggplot(data, aes(x = x, y = y)) +
+  geom_point() + # This adds the scatter plot points
+  geom_smooth(method = "lm", se = FALSE) + # This adds the linear model line without confidence interval
+  labs(x = "View Category", y = "Letter Difference Percentage", title = "Linear Model of y ~ x") +
+  theme_minimal() # Optional: Adds a minimalistic theme to the plot
+```
+
+```{r}
+# Create a data frame of the PCA scores
+df <- wideData[c('site','sex', 'age', 'setting', 'viewcat', 'encour')]
+
+df$sex <- ifelse(df$sex == "male", 1, 0)
+
+# Convert 'encour' where 'yes' is 1 and 'no' is 0
+df$encour <- ifelse(df$encour == "yes", 1, 0)
+
+numericMatrix <- matrix(as.numeric(unlist(df)), nrow = nrow(df), ncol = ncol(df))
+
+
+
+## Perform PCA
+pca_result <- prcomp(t(numericMatrix), center = TRUE, scale. = FALSE)
+#
+## Summary of PCA - shows variance explained by each component
+summary(pca_result)
+#
+## Accessing the principal components (rotation matrix)
+#print(pca_result$rotation)
+#
+## Scores of the original data on the principal components
+pca_result$x
+#
+## Visualizing the variance explained by each principal component - Scree plot
+#plot(pca_result, type = "l")
+
+# Advanced visualization with ggplot2 or other packages might require additional steps
+```
+
+## Research question 2
