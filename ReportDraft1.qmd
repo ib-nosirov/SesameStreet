@@ -383,6 +383,7 @@ that setting will be an important confounder to consider in modeling.
 
 ## 3. Statistical Analysis 
 
+### Research Question 1: Setup
 To address the first research question, we fit three multiple linear regression
 models: one for each subject. The models predicted improvement using prescore,
 age, viewcat, and site. The models were all of the form:
@@ -403,6 +404,7 @@ intercept, and its interpretation is not important in this context. A (type II)
 ANOVA table for each model is included in @tbl-anova-1, @tbl-anova-2, and
 @tbl-anova-3. 
 
+### Research Question 1: Analysis of Results
 ```{r}
 #| label: tbl-anova-1
 #| warning: false
@@ -515,6 +517,8 @@ plot(numb_means, comparisons=T, xlab = 'Mean Improvement',
      ylab = 'Viewing Category')
 ```
 
+### Research Question 2: Setup
+
 To address the second research question, we fit a mixed-effects linear model
 predicting improvement with subject, age, viewcat, site, and an interaction
 term between subject and viewcat while accounting for the random effects of the
@@ -526,9 +530,21 @@ $$\text{Improvement} = \beta_0 + \beta_1\text{Age} + \beta_{2,3}I_{Subject} +
 
 $$\epsilon\sim N(0,\sigma).$$
 
-The interpretations of $\beta0$ to $\beta10$ work the same as they did in the
-previous model. However, in this model we also include an interaction term and
-a random effects term. The interaction term 
+The interpretations of $\beta_0$ to $\beta_{10}$ work the same as they did in
+the previous model. However, in this model we also include an interaction term
+and a random effects term. The interaction term considers the effect of viewcat
+(amount of time watched) in the presence of another variable, `which_test',
+denoting which test is being administered. This way, we are considering if
+watching more sesame street has a unique benefit on a particular subject.
+The Analysis of Deviance table provides the significance of each fixed effect
+and interaction term. Notably, the interaction term between which_test and
+viewcat is highly significant (p < 2.2e-16), indicating that the amount of time
+spent watching Sesame Street has a differential impact on the improvement
+scores across the different test subjects. The random effects component shows
+variability in the intercepts across individual children (ID), indicating that
+there is significant individual difference in improvement scores that is not
+explained by the fixed effects in the model. This justifies the use of a random
+effects model over a fixed effects model.
 
 ```{r}
 mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID),
@@ -546,3 +562,24 @@ unmixed_model <- lm(diff_pct ~ which_test*viewcat + site, data=longData)
 G2 = -2 * logLik(unmixed_model) + 2 * logLik(mixed_model)
 pchisq(as.numeric(G2), df=1, lower.tail=F)
 ```
+
+### Research Question 2: Analysis of Results
+The fixed effects coefficients for which_test show that, on average, there were
+significant differences in improvement scores across the different areas
+tested, with letters and numbers showing negative estimates. This suggests that
+in comparison to forms (the reference category), these areas had lower
+improvement scores. The EMMeans plot visually indicates that the estimated
+means for improvement in each subject area at different levels of viewing time
+vary. The plot can help us identify which area has the lowest estimated means,
+signaling the most room for improvement. [However, without the actual EMMeans
+values, we cannot definitively state which area this is.] While statistical
+significance is evident, the effect sizes [not provided] would be necessary to
+assess the practical significance of the findings. Large effect sizes in areas
+with lower improvement scores would suggest meaningful opportunities for
+targeted educational interventions by Sesame Street. Given the significance of
+the interaction effects, Sesame Street should focus on the subject area that,
+when viewed more, shows the least improvement [e.g. min(viewcat1:whichtest -
+viewcat2:whichtest); visually, it looks like forms]. This area would benefit
+most from enhanced educational content.
+
+
