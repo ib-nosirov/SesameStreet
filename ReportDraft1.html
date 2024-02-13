@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.537">
+<meta name="generator" content="quarto-1.4.541">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -464,14 +464,7 @@ Figure&nbsp;9: Comparing Percent Increase Across Three Subjects (Letters, Number
 </section>
 <section id="statistical-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="statistical-analysis">3. Statistical Analysis</h2>
-<p><em>Describe statistical analysis in terms that your client will be able to understand and perhaps use in presenting their own research. This section should summarize all relevant analyses that lead to your final conclusions/decisions/recommendations, but should NEVER include visible code (folded code chunks are fine) or unformatted software output.</em></p>
-<ul>
-<li><em>Model Assumptions &amp; how checked/verified (details left to appendix)</em></li>
-<li><em>Interpretation of estimates/statistics/p-values IN CONTEXT</em></li>
-<li><em>Enough detail that the model/analysis could be reproduced by another statistician</em></li>
-</ul>
-<p>site + age + viewcat + prelet</p>
-<p>To address the first research question, we fit three multiple linear regression models: one for each subject. The models were all of the form: <span class="math display">\[\text{Improvement} = \beta_0 + \beta_1\text{prescore} + \beta_2\text{age} + \beta_3I_{viewcat_2}+ \dots + \beta_5I_{viewcat_4} + \beta_6I_{site_2} + \dots + \beta_9I_{site_5} + \epsilon, \\ \epsilon\sim N(0,\sigma).\]</span> In this model, <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> are attached to the two quantitative variables, and they signify the change in predicted improvement given a unit increase in prescore and age, respectively. The other <span class="math inline">\(\beta\)</span>’s (3 through 9) are attached to the two categorical variables, viewcat and site. The interpretation of <span class="math inline">\(\beta_3\)</span> is the change in predicted improvement for viewcat 2 when compared to viewcat 1 (the baseline), and this interpretation extends through to <span class="math inline">\(\beta_5\)</span>. Similarly, the interpretation of <span class="math inline">\(\beta_6\)</span> is the change in predicted improvement for site 2 when compared to site 1 (the baseline), and this interpretation extends through to <span class="math inline">\(\beta_9\)</span>. A (type II) ANOVA table for each model is included in <a href="#tbl-anova-1" class="quarto-xref">Table&nbsp;2</a>, <a href="#tbl-anova-2" class="quarto-xref">Table&nbsp;3</a>, and <a href="#tbl-anova-3" class="quarto-xref">Table&nbsp;4</a>.</p>
+<p>To address the first research question, we fit three multiple linear regression models: one for each subject. The models predicted improvement using prescore, age, viewcat, and site. The models were all of the form: <span class="math display">\[\text{SubjectImprovement} = \beta_0 + \beta_1\text{Prescore} + \beta_2\text{Age} + \beta_{3 \dots 5}I_{Viewcat}+ \beta_{6\dots9}I_{Site} + \epsilon,\]</span> <span class="math display">\[\epsilon\sim N(0,\sigma).\]</span> In this model, <span class="math inline">\(\beta_1\)</span> and <span class="math inline">\(\beta_2\)</span> are attached to the two quantitative variables, and they signify the change in predicted improvement given a unit increase in prescore and age, respectively. The other <span class="math inline">\(\beta\)</span>’s (3 through 9) are attached to the two categorical variables, viewcat and site. The interpretation of <span class="math inline">\(\beta_3\)</span> is the change in predicted improvement for viewcat 2 when compared to viewcat 1 (the baseline), and this interpretation extends through to <span class="math inline">\(\beta_5\)</span>. Similarly, the interpretation of <span class="math inline">\(\beta_6\)</span> is the change in predicted improvement for site 2 when compared to site 1 (the baseline), and this interpretation extends through to <span class="math inline">\(\beta_9\)</span>. Finally, <span class="math inline">\(\beta0\)</span> is the intercept, and its interpretation is not important in this context. A (type II) ANOVA table for each model is included in <a href="#tbl-anova-1" class="quarto-xref">Table&nbsp;2</a>, <a href="#tbl-anova-2" class="quarto-xref">Table&nbsp;3</a>, and <a href="#tbl-anova-3" class="quarto-xref">Table&nbsp;4</a>.</p>
 <div class="cell">
 <div id="tbl-anova-1" class="cell quarto-float anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -714,6 +707,74 @@ Figure&nbsp;12: Mean Improvement in Numbers by Viewing Category after accounting
 </figure>
 </div>
 </div>
+</div>
+</div>
+<p>To address the second research question, we fit a mixed-effects linear model predicting improvement with subject, age, viewcat, site, and an interaction term between subject and viewcat while accounting for the random effects of the individual child (in the model, we call the random effect ID). The mathematical form of this model is: <span class="math display">\[\text{Improvement} = \beta_0 + \beta_1\text{Age} + \beta_{2,3}I_{Subject} + \beta_{4\dots6}I_{Viewcat} + \beta_{7 \dots 10}I_{Site} + \beta_{11 \dots 16}I_{Viewcat}I_{Site} + \gamma ID + \epsilon,\]</span> <span class="math display">\[\epsilon\sim N(0,\sigma).\]</span></p>
+<p>The interpretations of <span class="math inline">\(\beta0\)</span> to <span class="math inline">\(\beta10\)</span> work the same as they did in the previous model. However, in this model we also include an interaction term and a random effects term. The interaction term</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: diff_pct
+                     Chisq Df Pr(&gt;Chisq)    
+which_test          12.271  2   0.002165 ** 
+viewcat             33.869  3  2.111e-07 ***
+site                14.866  4   0.004987 ** 
+which_test:viewcat 101.107  6  &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: diff_pct ~ which_test * viewcat + site + (1 | ID)
+   Data: longData
+
+REML criterion at convergence: -2350.8
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2161 -0.6353 -0.0073  0.6377  3.9825 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ ID       (Intercept) 0.01547  0.1244  
+ Residual             0.01457  0.1207  
+Number of obs: 2160, groups:  ID, 240
+
+Fixed effects:
+                            Estimate Std. Error t value
+(Intercept)                 0.118336   0.026291   4.501
+which_testletters          -0.096105   0.013413  -7.165
+which_testnumbers          -0.053841   0.013413  -4.014
+viewcat2                    0.039801   0.027490   1.448
+viewcat3                    0.050941   0.027928   1.824
+viewcat4                    0.083597   0.028377   2.946
+site2                       0.080962   0.024768   3.269
+site3                       0.004154   0.023506   0.177
+site4                       0.015741   0.027519   0.572
+site5                       0.062351   0.035639   1.749
+which_testletters:viewcat2  0.058404   0.018488   3.159
+which_testnumbers:viewcat2  0.028656   0.018488   1.550
+which_testletters:viewcat3  0.160194   0.018212   8.796
+which_testnumbers:viewcat3  0.061277   0.018212   3.365
+which_testletters:viewcat4  0.133313   0.018346   7.266
+which_testnumbers:viewcat4  0.035741   0.018346   1.948</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Correlation matrix not shown by default, as p = 16 &gt; 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ReportDraft1_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6.099354e-190</code></pre>
 </div>
 </div>
 </section>
