@@ -123,12 +123,17 @@ plot(fit2)
 Mixed effects model for which test is best?
 ```{r}
 
-mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID), data = longData)
+mixed_model <- lmer(diff_pct ~ which_test*viewcat + which_test*site + (1|ID), data = longData)
 Anova(mixed_model)
 summary(mixed_model)
 
 mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
 plot(mixed_model_means, comparisons=T)
+summary(mixed_model_means)
+pairs(mixed_model_means)
+
+mixed_model_means2 <- emmeans(mixed_model, ~which_test|site, adjust = 'HSD')
+plot(mixed_model_means2, comparisons=T)
 
 
 #likelihood ratio test to see if mixed model is needed
@@ -139,6 +144,32 @@ pchisq(as.numeric(G2), df=1, lower.tail=F)
 
 # make sure effect sizes are not tiny
 effectsize(mixed_model)
+
+plot(mixed_model)
+res_mm <- residuals(mixed_model)
+qqnorm(res_mm)
+qqline()
+
+### UNFINISHED - NEED TO PLOT RANDOM EFFECT RESIDUALS QQPLOT ##
+
+```
+
+Mixed effects model three way interaction...
+```{r}
+
+mixed_model2 <- lmer(diff_pct ~ which_test*viewcat*site + (1|ID), data = longData)
+Anova(mixed_model2)
+summary(mixed_model2)
+
+mixed_model_means <- emmeans(mixed_model2, ~which_test|viewcat*site, adjust = 'HSD')
+plot(mixed_model_means, comparisons=T)
+summary(mixed_model_means)
+pairs(mixed_model_means)
+
+# make sure effect sizes are not tiny
+effectsize(mixed_model2)
+
+plot(mixed_model2)
 
 ```
 
