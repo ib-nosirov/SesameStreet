@@ -392,6 +392,7 @@ $$\text{SubjectImprovement} = \beta_0 + \beta_1\text{Prescore} +
 \beta_2\text{Age} + \beta_{3 \dots 5}I_{Viewcat}+ \beta_{6\dots9}I_{Site} +
 \epsilon,$$ 
 $$\epsilon\sim N(0,\sigma).$$
+$$\epsilon\sim N(0,\sigma_\epsilon).$$
 In this model, $\beta_1$ and $\beta_2$ are attached to the two quantitative
 variables, and they signify the change in predicted improvement given a unit
 increase in prescore and age, respectively. The other $\beta$'s (3 through 9)
@@ -530,8 +531,10 @@ form of this model is:
 $$\text{Improvement} = \beta_0 + \beta_1\text{Age} + \beta_{2,3}I_{Subject} +
 \beta_{4\dots6}I_{Viewcat} + \beta_{7 \dots 10}I_{Site} + \beta_{11 \dots
 16}I_{Viewcat}I_{Site} + \gamma ID + \epsilon,$$ 
+16}I_{Viewcat}I_{Site} + \gamma + \epsilon,$$ 
 
 $$\epsilon\sim N(0,\sigma).$$
+$$\epsilon\sim N(0,\sigma_\epsilon), \gamma \sim N(0, \sigma_\gamma)$$
 
 The interpretations of $\beta_0$ to $\beta_{10}$ work the same as they did in
 the previous model. However, in this model we also include an interaction term

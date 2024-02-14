@@ -148,9 +148,10 @@ effectsize(mixed_model)
 plot(mixed_model)
 res_mm <- residuals(mixed_model)
 qqnorm(res_mm)
-qqline()
+qqline(res_mm, col='red')
 
-### UNFINISHED - NEED TO PLOT RANDOM EFFECT RESIDUALS QQPLOT ##
+qqnorm(unlist(ranef(mixed_model)))
+qqline(res_mm, col='red')
 
 ```
 
