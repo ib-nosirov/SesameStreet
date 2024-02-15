@@ -19,6 +19,8 @@ library(emmeans)
 library(lme4)
 library(car)
 
+install.packages("effectsize")
+library(effectsize)
 ```
 
 ## Import Data
@@ -174,3 +176,25 @@ plot(mixed_model2)
 
 ```
 
+Take out site2 and fit same mixed effects model as in the cell above...
+```{r}
+# take out site2
+# Assuming longData is your original data frame
+site_2 <- subset(longData, site == '2')
+site_not_2 <- subset(longData, site != '2')
+
+MM_noSite2 <- lmer(diff_pct ~ which_test*viewcat*site + (1|ID), data = site_not_2)
+Anova(MM_noSite2)
+summary(MM_noSite2)
+
+MM_noSite2Means <- emmeans(mixed_model2, ~which_test|viewcat*site, adjust = 'HSD')
+plot(MM_noSite2Means, comparisons=T)
+summary(MM_noSite2Means)
+pairs(MM_noSite2Means)
+
+# make sure effect sizes are not tiny
+effectsize(MM_noSite2Means)
+
+plot(MM_noSite2)
+
+```

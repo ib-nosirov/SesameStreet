@@ -46,32 +46,29 @@ longData$viewcat <-  as.character(longData$viewcat)
 longData$setting <-  as.character(longData$setting)
 ```
 
-## 1. Project Description
+# Project Description
 
-The project involves an observational study designed to assess the impact of
-"Sesame Street" viewership on children's learning outcomes, particularly in
-letters, numbers, and forms. The study is in the analysis stage, examining
-existing data collected from children across five different sites in the United
-States. Variables observed include, but are not limited to, viewing frequency,
-setting, encouragement to watch, and pretest scores of vocabulary maturity
-(Peabody Picture Vocabulary Test). Its objective is to determine the show's
-effectiveness in educational content delivery and identify areas for
-improvement. Results will be used to enhance Sesame Street's educational focus
-and impact, as per the client's request for an upcoming board meeting
-presentation.
+In this project, we analyze the results of an observational study designed to
+assess the impact of *Sesame Street* viewership on children's learning
+outcomes; More specifically, we are interested in letters, numbers, and forms.
+We begin by exploring data collected from children in five different sites
+across the United States. Variables observed include, but are not limited to,
+viewing frequency, setting, encouragement to watch, and pretest scores of
+vocabulary maturity (Peabody Picture Vocabulary Test). We aim to determine the
+show's effectiveness in educational content delivery and identify areas for
+improvement. These results will be used to enhance *Sesame Street*'s
+educational focus and impact, as per the client's request for an upcoming board
+meeting presentation. We begin by posing the following research questions.
 
-## 1.1 Research Questions
+## Research Questions
 
-**Question 1:** How does viewership of Sesame Street influence children's
-learning outcomes - specifically in terms of letters, numbers, and forms
-knowledge - as measured by the percent increase in post-test scores compared to
-pre-test scores? Is this result consistent if we instead consider percent
-achievable gain (PAG)?
+**Question 1:** Does our programming improve children’s knowledge of letters,
+numbers, and forms?
 
-**Question 2:** Which area, of letters, numbers, and forms, has the most room
-for improvement? Which should Sesame street focus on improving in the future?
+**Question 2:** What, if any, area should we focus on for improvement? E.g. are
+we better at teaching letters than we are at numbers?
 
-## 1.2 Variables
+## Variables
 
 We considered a variety of variables in our preliminary analysis of the Sesame
 Street study. The dataset contained several explanatory variables, but we chose
@@ -114,11 +111,10 @@ variable.desc$Notes <- c("Identifying numeric sequence","Five different
 			 pre-score percent (Response)")
 
 knitr::kable(variable.desc)
-
 ```
 
 
-## 2. Exploratory Data Analysis (EDA)
+# Exploratory Data Analysis (EDA)
 
 Our exploratory data analysis of the Sesame Street study revealed promising
 leads for modeling, as well as concerns about possible data issues and
@@ -405,7 +401,9 @@ intercept, and its interpretation is not important in this context. A (type II)
 ANOVA table for each model is included in @tbl-anova-1, @tbl-anova-2, and
 @tbl-anova-3. 
 
-### Research Question 1: Analysis of Results
+# Statistical Analysis
+
+## Research Question 1
 ```{r}
 #| label: tbl-anova-1
 #| warning: false
@@ -518,9 +516,13 @@ plot(numb_means, comparisons=T, xlab = 'Mean Improvement',
      ylab = 'Viewing Category')
 ```
 
-Effect size is a metric which tells us whether the statistical differences we find are large enough to be practically important. We calculated effect sizes with respect to viewing category for each model, and found that in all models, differences between viewing category were associated with a moderate or large effect sizes. 
+Effect size is a metric which tells us whether the statistical differences we
+find are large enough to be practically important. We calculated effect sizes
+with respect to viewing category for each model, and found that in all models,
+differences between viewing category were associated with a moderate or large
+effect sizes. 
 
-## Research Question 2: Setup
+## Research Question 2
 
 To address the second research question, we fit a mixed-effects linear model
 predicting improvement with subject, age, viewcat, site, and an interaction
@@ -539,9 +541,11 @@ and a random effects term. The interaction term considers the effect of viewcat
 (amount of time watched) in the presence of another variable, which_test,
 denoting which subject is being tested. This way, we are considering if
 watching more sesame street has a unique benefit on a particular subject.
-The purpose of the random effects term is to account for the correlation between scores in different subjects for any particular child. That is, a child's score in letters is likely correlated with that child's score in forms and numbers. A (type II) ANOVA table for each model is included in @tbl-anova-4. 
-
-### Research Question 2: Analysis of Results
+The purpose of the random effects term is to account for the correlation
+between scores in different subjects for any particular child. That is, a
+child's score in letters is likely correlated with that child's score in forms
+and numbers. A (type II) ANOVA table for each model is included in
+@tbl-anova-4. 
 
 The Analysis of Variance table provides the significance of each fixed effect
 and interaction term. Notably, the interaction term between which_test and
@@ -550,7 +554,12 @@ spent watching Sesame Street has a differential impact on the improvement
 scores across the different test subjects. The random effects component shows
 variability in the intercepts across individual children (ID), indicating that
 there is significant individual difference in improvement scores that is not
-explained by the fixed effects in the model. This is a good sign that a random effects model is necessary in this case. To further justify using random effects in our model, we conducted a likelihood ratio test comparing a model with and without random effects. The test resulted in a very low p-value (p < 2.2e-16), and so we confirmed that the random effects were necessary in this model. 
+explained by the fixed effects in the model. This is a good sign that a random
+effects model is necessary in this case. To further justify using random
+effects in our model, we conducted a likelihood ratio test comparing a model
+with and without random effects. The test resulted in a very low p-value (p <
+2.2e-16), and so we confirmed that the random effects were necessary in this
+model. 
 
 ```{r}
 #| label: tbl-anova-4
@@ -564,13 +573,24 @@ mixed_model <- lmer(diff_pct ~ which_test*viewcat + site + (1|ID),
 knitr::kable(Anova(mixed_model))
 ```
 
-
 In @fig-pairwise-all, we can observe the confidence intervals for the mean
-improvement stratified by which_test (subject) and viewcat after accounting for age and site. The reason that this plot is stratified by both variables is because our model has an interaction term, and so these are conditional means rather than marginal means. This plot helps us to identify which area has the lowest estimated means, signaling the most room for improvement. Visually, we see that this trend is not the same across all viewing cateogories. In viewcat 1, letters has the lowest mean improvement. In viewcat 2, the trend is not so clear since the red arrows for numbers and letters overlap with each other, so either subject could plausibly have the lowest mean improvement. In viewcat's 3 and 4, we see that either of numbers or forms have the lowest mean improvement. Since Sesame Street cares most about the effect of watching their show, the important result here is for viewing categories 3 and 4, since children who watched less of the show will presumably have been less impacted by it. 
+improvement stratified by which_test (subject) and viewcat after accounting for
+age and site. The reason that this plot is stratified by both variables is
+because our model has an interaction term, and so these are conditional means
+rather than marginal means. This plot helps us to identify which area has the
+lowest estimated means, signaling the most room for improvement. Visually, we
+see that this trend is not the same across all viewing cateogories. In viewcat
+1, letters has the lowest mean improvement. In viewcat 2, the trend is not so
+clear since the red arrows for numbers and letters overlap with each other, so
+either subject could plausibly have the lowest mean improvement. In viewcat's 3
+and 4, we see that either of numbers or forms have the lowest mean improvement.
+Since Sesame Street cares most about the effect of watching their show, the
+important result here is for viewing categories 3 and 4, since children who
+watched less of the show will presumably have been less impacted by it. 
 
-We calculated effect sizes using Pearson's r statistic for this model with respect to the differences between the subjects, and we found that the differences between subjects had moderate effect sizes. 
-
-<!-- While statistical significance is evident, the effect sizes [not provided] would be necessary to assess the practical significance of the findings. Large effect sizes in areas with lower improvement scores would suggest meaningful opportunities for targeted educational interventions by Sesame Street. Given the significance of the interaction effects, Sesame Street should focus on the subject area that, when viewed more, shows the least improvement [e.g. min(viewcat1:whichtest - viewcat2:whichtest); visually, it looks like forms]. This area would benefit most from enhanced educational content. -->
+We calculated effect sizes using Pearson's r statistic for this model with
+respect to the differences between the subjects, and we found that the
+differences between subjects had moderate effect sizes. 
 
 ```{r}
 #| label: fig-pairwise-all
@@ -580,7 +600,6 @@ We calculated effect sizes using Pearson's r statistic for this model with respe
 #| fig-align: "center"
 #| layout-ncol: 1
 
-
 mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
 plot(mixed_model_means, comparisons=T, xlab = 'Mean Improvement',
      ylab = 'Viewing Category')
@@ -588,8 +607,21 @@ plot(mixed_model_means, comparisons=T, xlab = 'Mean Improvement',
 # mixed_model_means
 # 
 # effectsize(mixed_model)
-
-
 ```
 
+# Recommendations
+**Question 1:** Does our programming improve children’s knowledge of letters, numbers,
+and forms?
+ 
+More Sesame Street watch-time was associated with greater improvements in letters,
+numbers, and forms after accounting for differences in pre-score, age, and site.
+ 
+**Question 2:** What, if any, area should we focus on for improvement?  E.g. are we
+better at teaching letters than we are at numbers?
+ 
+The relationship between subject depended on both site and viewing category.
+For children who watched more Sesame street (viewcat 3 or 4), their smallest
+improvements were in numbers and forms, while their greatest improvements were in
+letters, after accounting for age and site.
 
+# Appendix
