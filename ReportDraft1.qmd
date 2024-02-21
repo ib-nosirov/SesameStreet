@@ -32,6 +32,7 @@ library(ggformula)
 library(mosaic)
 ```
 
+[move to Appendix or silence]
 ```{r}
 # Read in data
 
@@ -173,6 +174,7 @@ between viewing time (categorized as levels 1-4) and percent score increase.
 Although the variability is not completely consistent across viewing levels,
 overall the data are relatively well-behaved. 
 
+[move to Appendix]
 ```{r}
 #| label: fig-LNF2
 #| echo: false
@@ -212,6 +214,7 @@ comparison to the plots using percent increase as the response variable, the
 data have a much wider spread with many more outliers. This could pose some
 problems in future modeling. 
 
+[move to Appendix]
 ```{r}
 #| label: fig-LNF3
 #| echo: false
@@ -234,6 +237,7 @@ forms, followed by numbers and then letters. However, all three boxplots have
 significant overlap with each other, which means that statistical analysis will
 likely not yield usable differences. 
 
+[move to Appendix]
 ```{r}
 #| label: fig-LNF4
 #| echo: false
@@ -260,6 +264,8 @@ to be similar around the middle of the boxplot.
 
 For simplicity, all investigation of possible confounders (below), was done
 with only percent increase as response variable. 
+
+[move to Appendix]
 ```{r}
 #| label: fig-Encour
 #| echo: false
@@ -298,6 +304,7 @@ an impact on percent score increase, particularly for letters, but there is
 enough overlap of the boxplots in all three plots that more analysis is needed.
 This may be an important confounder to consider in modeling.
 
+[move to Appendix]
 ```{r}
 #| label: fig-Sex
 #| echo: false
@@ -360,6 +367,7 @@ percent increase in score in any of the tests. The points appear to be
 scattered more or less at random. It does not appear that age will be an
 important confounder to consider in modeling.
 
+[move to Appendix]
 ```{r}
 #| label: fig-Setting
 #| echo: false
@@ -412,25 +420,25 @@ ANOVA table for each model is included in @tbl-anova-1, @tbl-anova-2, and
 #| echo: false
 #| tbl-cap: "ANOVA table for multiple linear regression model to predict improvement in letters using viewcat, prescore, age, and site"
 
-subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'peabody', 'prelet', 'let_diff_pct')]
+subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat',
+			 'encour', 'peabody', 'prelet', 'let_diff_pct')]
 
 let_lm <- lm(let_diff_pct ~ site + age + viewcat + prelet, data = subset_let)
 
 knitr::kable(Anova(let_lm))
 ```
 
-In this table the values that we are most interested in are the p-values on the
-right-hand column. Although some values appear to be zero, they are not, but
-are so small that they were rounded to zero. We will consider any p-value less
-than 0.05 to be "significant," meaning we can infer that what we observe is a
-product of the true process and not random chance. For the quantitative
-variables of age and prescore, the small p-values indicate that each of these
-variables is important for predicting improvement. For the categorical
-variables of viewcat and site, the small p-values indicate that at least one of
-the viewing categories and at least one of the sites resulted in a different
-improvement than another. The same interpretations can be applied to the two
-ANOVA tables below, which are analogous to this one but for the forms and
-numbers models. 
+In this table, we are most interested in the p-values on the right-hand column.
+Although some values appear to be zero, they are not, but are so small that
+they were rounded to zero. We will consider any p-value less than 0.05 to be
+"significant," meaning we can infer that what we observe is a product of the
+true process and not random chance. For the quantitative variables of age and
+prescore, the small p-values indicate that each of these variables is important
+for predicting improvement. For the categorical variables of viewcat and site,
+the small p-values indicate that at least one of the viewing categories and at
+least one of the sites resulted in a different improvement than another. The
+same interpretations can be applied to the two ANOVA tables below, which are
+analogous to this one but for the forms and numbers models. 
 
 ```{r}
 #| label: tbl-anova-2
@@ -547,7 +555,10 @@ The purpose of the random effects term is to account for the correlation
 between scores in different subjects for any particular child. That is, a
 child's score in letters is likely correlated with that child's score in forms
 and numbers. A (type II) ANOVA table for each model is included in
-@tbl-anova-4. 
+@tbl-anova-4. A Type II ANOVA, primarily used in the context of multiple
+regression and analysis of variance with more than one explanatory variable,
+focuses on testing the unique contribution of each variable while controlling
+for the other variables in the model.
 
 The Analysis of Variance table provides the significance of each fixed effect
 and interaction term. Notably, the interaction term between which_test and
@@ -559,9 +570,13 @@ there is significant individual difference in improvement scores that is not
 explained by the fixed effects in the model. This is a good sign that a random
 effects model is necessary in this case. To further justify using random
 effects in our model, we conducted a likelihood ratio test comparing a model
-with and without random effects. The test resulted in a very low p-value (p <
-2.2e-16), and so we confirmed that the random effects were necessary in this
-model. 
+with and without random effects. The likelihood ratio test is a statistical
+procedure used to compare the fit of two models, one of which is a special case
+of the other (often referred to as the "nested" model), by evaluating the ratio
+of their likelihoods; it determines whether the more complex model
+significantly improves the fit to the data compared to the simpler model. The
+test resulted in a very low p-value (p < 2.2e-16), and so we confirmed that the
+random effects were necessary in this model. 
 
 ```{r}
 #| label: tbl-anova-4
@@ -579,16 +594,20 @@ In @fig-pairwise-all, we can observe the confidence intervals for the mean
 improvement stratified by which_test (subject) and viewcat after accounting for
 age and site. The reason that this plot is stratified by both variables is
 because our model has an interaction term, and so these are conditional means
-rather than marginal means. This plot helps us to identify which area has the
-lowest estimated means, signaling the most room for improvement. Visually, we
-see that this trend is not the same across all viewing cateogories. In viewcat
-1, letters has the lowest mean improvement. In viewcat 2, the trend is not so
-clear since the red arrows for numbers and letters overlap with each other, so
-either subject could plausibly have the lowest mean improvement. In viewcat's 3
-and 4, we see that either of numbers or forms have the lowest mean improvement.
-Since Sesame Street cares most about the effect of watching their show, the
-important result here is for viewing categories 3 and 4, since children who
-watched less of the show will presumably have been less impacted by it. 
+rather than marginal means. A marginal mean is the average value of a variable
+across levels of another variable, essentially summarizing the mean of the
+outcomes for a factor in a multi-factorial design or within the context of
+mixed models, regardless of other factors in the analysis. This plot helps us
+to identify which area has the lowest estimated means, signaling the most room
+for improvement. Visually, we see that this trend is not the same across all
+viewing cateogories. In viewcat 1, letters has the lowest mean improvement. In
+viewcat 2, the trend is not so clear since the red arrows for numbers and
+letters overlap with each other, so either subject could plausibly have the
+lowest mean improvement. In viewcat's 3 and 4, we see that either of numbers or
+forms have the lowest mean improvement. Since Sesame Street cares most about
+the effect of watching their show, the important result here is for viewing
+categories 3 and 4, since children who watched less of the show will presumably
+have been less impacted by it. 
 
 We calculated effect sizes using Pearson's r statistic for this model with
 respect to the differences between the subjects, and we found that the
@@ -615,39 +634,55 @@ plot(mixed_model_means, comparisons=T, xlab = 'Mean Improvement',
 **Question 1:** Does our programming improve children’s knowledge of letters, numbers,
 and forms?
  
-More Sesame Street watch-time was associated with greater improvements in letters,
-numbers, and forms after accounting for differences in pre-score, age, and site.
+More Sesame Street watch-time was associated with greater improvements in
+letters, numbers, and forms after accounting for differences in pre-score, age,
+and site.
  
 **Question 2:** What, if any, area should we focus on for improvement?  E.g. are we
 better at teaching letters than we are at numbers?
  
-The relationship between subject depended on both site and viewing category.
-For children who watched more Sesame street (viewcat 3 or 4), their smallest
-improvements were in numbers and forms, while their greatest improvements were in
-letters, after accounting for age and site.
+The relationship between subject depended primarily on viewing category. For
+children who watched more Sesame street (viewcat 3 or 4), their smallest
+improvements were in numbers and forms, while their greatest improvements were
+in letters, after accounting for age and site.
 
 # Resources 
 
 For resources related to multiple linear regression, please see <https://online.stat.psu.edu/statprogram/stat461/>
 
 For resources on mixed-effects models, please see
-** insert link **
+<https://stats.oarc.ucla.edu/other/mult-pkg/introduction-to-linear-mixed-models/>
 
 # Appendix
 
 ## Additional Considerations
 
-### Association is not causation.
-
-* Include a statement cautioning against making causal conclusions *
+Observational Nature of the Study: This study is observational and not
+randomized, which means it was designed to observe outcomes without manipulating
+the study environment or how subjects were allocated to different groups. This
+design inherently limits the ability to infer causality from the observed
+associations.
 
 ### Generalizing to a larger population  
 
-* Talk about who we can generalize to *
+Generalization of Findings: The findings from this study can be generalized only
+to children who resemble the participants in terms of demographic
+characteristics and who have watched Sesame Street. Specifically, these children
+fit into one of the five demographic sites included in the study. This
+limitation is important for understanding the scope and applicability of the
+study's conclusions.
 
 ### Model Choice
 
-* Maybe include something here, maybe cut it *
+Having fit a mixed model with viewcat as an interaction term, we also fit a
+model where site is an interaction term, instead. We observed significant
+results with both models, so we fit a three-way interaction model, which did not
+reveal any significant or, more importantly, interpretable results. At this
+point, we recalled  that the client is interested in improving "Sesame Street"
+programming, meaning information about socio-economic status is not as important
+to them as the effect of their programming on children who watched their
+programming to various degrees. For this reason, we ommitted the site and
+three-way fits.
 
 ## Technical Appendix
 
@@ -675,8 +710,6 @@ numb_lm <- lm(numb_diff_pct ~ site + age + viewcat + prenumb, data = subset_numb
 mplot(let_lm, which = c(1,2))
 mplot(form_lm, which = c(1,2))
 mplot(numb_lm, which = c(1,2))
-
-
 ```
 
 
@@ -689,8 +722,6 @@ mplot(numb_lm, which = c(1,2))
 #| fig-align: "center"
 #| layout-ncol: 1
 #| layout-nrow: 3
-
-
 
 mixed_model <- lmer(diff_pct ~ which_test*viewcat + which_test*site + (1|ID), data = longData)
 Anova(mixed_model)
