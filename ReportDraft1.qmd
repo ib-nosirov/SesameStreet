@@ -28,6 +28,8 @@ library(emmeans)
 library(lme4)
 library(car)
 library(effectsize)
+library(ggformula)
+library(mosaic)
 ```
 
 ```{r}
@@ -62,11 +64,11 @@ meeting presentation. We begin by posing the following research questions.
 
 ## Research Questions
 
-**Question 1:** Does our programming improve children’s knowledge of letters,
+**Question 1:** Does Sesame Street's programming improve children’s knowledge of letters,
 numbers, and forms?
 
-**Question 2:** What, if any, area should we focus on for improvement? E.g. are
-we better at teaching letters than we are at numbers?
+**Question 2:** What, if any, area should Sesame Street focus on for improvement? E.g. are
+they better at teaching letters than they are at numbers?
 
 ## Variables
 
@@ -624,94 +626,71 @@ For children who watched more Sesame street (viewcat 3 or 4), their smallest
 improvements were in numbers and forms, while their greatest improvements were in
 letters, after accounting for age and site.
 
+# Resources 
+
+For resources related to multiple linear regression, please see <https://online.stat.psu.edu/statprogram/stat461/>
+
+For resources on mixed-effects models, please see
+** insert link **
+
 # Appendix
 
-## Import Data
+## Additional Considerations
+
+### Association is not causation.
+
+* Include a statement cautioning against making causal conclusions *
+
+### Generalizing to a larger population  
+
+* Talk about who we can generalize to *
+
+### Model Choice
+
+* Maybe include something here, maybe cut it *
+
+## Technical Appendix
+
+### Further EDA
+
+* Include all the EDA we take out of EDA section *
+
+### Add in t-tests for the differences in means (pairs) corresponding to each CI plot we have above
+
+### Assess conditions of linear models for each subject (letters, forms, numbers)
 ```{r}
+#| label: fig-eval-linear-models
+#| echo: false
+#| warning: false
+#| fig-cap: "Insert caption"
+#| fig-align: "center"
+#| layout-ncol: 2
+#| layout-nrow: 3
 
-wideData <- read.csv('clean_df_wide.csv')
-longData <- read.csv('clean_df_long.csv')
 
-# make categorical variables categorical 
-wideData$site <-  as.character(wideData$site)
-wideData$viewcat <-  as.character(wideData$viewcat)
-wideData$setting <-  as.character(wideData$setting)
-wideData$ID <-  as.character(wideData$ID)
-
-longData$site <-  as.character(longData$site)
-longData$viewcat <-  as.character(longData$viewcat)
-longData$setting <-  as.character(longData$setting)
-longData$ID <-  as.character(longData$ID)
-
-subset_let <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat',
-			 'encour', 'peabody', 'prelet', 'let_diff_pct')]
-subset_form <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat',
-			  'encour', 'preform', 'peabody','form_diff_pct')]
-subset_numb <- wideData[c('ID', 'site', 'sex', 'age', 'setting', 'viewcat', 'encour', 'prenumb', 'peabody','numb_diff_pct')]
-```
-
-## Linear Models
-```{r}
 let_lm <- lm(let_diff_pct ~ site + age + viewcat + prelet, data = subset_let)
 form_lm <- lm(form_diff_pct ~ site + age + viewcat + preform , data = subset_form)
 numb_lm <- lm(numb_diff_pct ~ site + age + viewcat + prenumb, data = subset_numb)
 
-Anova(let_lm)
-Anova(form_lm)
-Anova(numb_lm)
+mplot(let_lm, which = c(1,2))
+mplot(form_lm, which = c(1,2))
+mplot(numb_lm, which = c(1,2))
 
-# summary(let_lm)
-# summary(form_lm)
-# summary(numb_lm)
-
-let_means <- emmeans(let_lm, ~viewcat, adjust = 'HSD')
-let_means
-plot(let_means, comparisons=T)
-
-form_means <- emmeans(form_lm, ~viewcat, adjust = 'HSD')
-form_means
-plot(form_means, comparisons=T)
-
-numb_means <- emmeans(numb_lm, ~viewcat, adjust = 'HSD')
-numb_means
-plot(numb_means, comparisons=T)
-
-# make sure effect sizes are not tiny
-effectsize(let_lm)
-effectsize(form_lm)
-effectsize(numb_lm)
-
-par(mfrow=c(2,2))
-plot(let_lm)
-par(mfrow=c(2,2))
-plot(form_lm)
-par(mfrow=c(2,2))
-plot(numb_lm)
 
 ```
 
-## Which test does the best?
+
+### Assess conditions of mixed models
 ```{r}
-fit2 <- lm(diff_pct ~ which_test + site + viewcat, data = longData)
-Anova(fit2)
-summary(fit2)
+#| label: fig-eval-mixed-model
+#| echo: false
+#| warning: false
+#| fig-cap: "Insert caption"
+#| fig-align: "center"
+#| layout-ncol: 1
+#| layout-nrow: 3
 
-whichtest_means <- emmeans(fit2, ~which_test, adjust = 'HSD')
-plot(whichtest_means, comparisons=T)
 
-# viewcat_means <- emmeans(fit2, ~viewcat, adjust = 'HSD')
-# plot(viewcat_means, comparisons=T)
-# 
-# site_means <- emmeans(fit2, ~site, adjust = 'HSD')
-# plot(site_means, comparisons=T)
-
-par(mfrow=c(2,2))
-plot(fit2)
-
-```
-
-## Mixed effects model for which test is best?
-```{r}
 
 mixed_model <- lmer(diff_pct ~ which_test*viewcat + which_test*site + (1|ID), data = longData)
 Anova(mixed_model)
