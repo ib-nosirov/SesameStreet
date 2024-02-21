@@ -160,11 +160,11 @@ qqline(res_mm, col='red')
 Mixed effects model three way interaction...
 ```{r}
 
-mixed_model2 <- lmer(diff_pct ~ which_test*viewcat*site + (1|ID), data = longData)
+mixed_model2 <- lmer(diff_pct ~ which_test*site*viewcat + (1|ID), data = longData)
 Anova(mixed_model2)
 summary(mixed_model2)
 
-mixed_model_means <- emmeans(mixed_model2, ~which_test|viewcat*site, adjust = 'HSD')
+mixed_model_means <- emmeans(mixed_model2, ~which_test|site*viewcat, adjust = 'HSD')
 plot(mixed_model_means, comparisons=T)
 summary(mixed_model_means)
 pairs(mixed_model_means)
