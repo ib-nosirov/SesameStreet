@@ -32,8 +32,13 @@ library(ggformula)
 library(mosaic)
 ```
 
-[move to Appendix or silence]
 ```{r}
+#| echo: false
+#| include: false
+#| label: Import Data
+#| warning: false
+#| 
+
 # Read in data
 
 wideData <- read.csv('clean_df_wide.csv')
@@ -76,20 +81,8 @@ they better at teaching letters than they are at numbers?
 We considered a variety of variables in our preliminary analysis of the Sesame
 Street study. The dataset contained several explanatory variables, but we chose
 to focus on viewing frequency (Viewcat) as our main explanatory variable; and
-site, sex, age, setting, and encouragement as possible confounding variables.
-The dataset contained pre- and post-test scores for six different domains, but
-we were only interested in scores for letters, numbers, and forms. We also
-defined two possible response variables: percent increase and percent
-achievable gain (PAG). The first, percent increase, is simply the difference
-between the posttest score and pretest score, as percentages. The second, PAG,
-is the child's improvement (post-test score minus pre-test score) divided by
-total possible improvement (maximum test score minus pretest score). The goal
-with this measure is to capture improvement while accounting for the fact that
-advanced students cannot improve as much as those who were not as advanced to
-begin with. All variables used in our analysis are summarized in the table
-below. Although there were other variables included in the dataset, we decided
-that these were the most important ones to answer our client's research
-questions.
+site, sex, age, setting, and encouragement as other variables which could affect test scores. The dataset contained pre- and post-test scores for six different domains, but
+we were only interested in scores for letters, numbers, and forms. All variables used in our analysis are summarized in the table below. Although there were other variables included in the dataset, we decided that these were the most important ones to answer our client's research questions.
 
 ```{r}
 #| label: tbl-variables
@@ -121,11 +114,15 @@ knitr::kable(variable.desc)
 
 Our exploratory data analysis of the Sesame Street study revealed promising
 leads for modeling, as well as concerns about possible data issues and
-confounders we will have to watch out for as we move forward. As a whole, it
-appeared that Sesame Street viewership was positively correlated with greater
-improvement, as measured by PAG and percent increase across all tests (letters,
+confounders we will have to watch out for as we move forward. We defined two possible response variables: improvement and percent achievable gain (PAG). The first, improvement, is simply the difference between the posttest score and pretest score, as percentages. The second, PAG, is the child's improvement (post-test score minus pre-test score) divided by
+total possible improvement (maximum test score minus pretest score). The goal
+with this measure is to capture improvement while accounting for the fact that
+advanced students cannot improve as much as those who were not as advanced to
+begin with.
+
+As a whole, it appeared that Sesame Street viewership was positively correlated with greater improvement, as measured by PAG and improvement across all tests (letters,
 forms, and numbers). The comparative improvement across tests did not appear to
-have a clear trend measured by both PAG and percent increase.
+have a clear trend measured by both PAG and improvement.
 
 While PAG is has nice theoretical properties, its use as a response variable in
 this study may not be practical; it introduced more nonuniform variability in
@@ -174,174 +171,28 @@ between viewing time (categorized as levels 1-4) and percent score increase.
 Although the variability is not completely consistent across viewing levels,
 overall the data are relatively well-behaved. 
 
-[move to Appendix]
-```{r}
-#| label: fig-LNF2
-#| echo: false
-#| warning: false
-#| fig-cap: "The Relationship Between Viewing Time of Sesame Street PAG for Letters, Numbers, and Forms. Note that viewing time is categorical with higher values corresponding to more time viewing Sesame Street"
-#| layout-ncol: 3
-#| fig-subcap:  
-#|   - "Letters"
-#|   - "Numbers"
-#|   - "Forms"
-
-plot <- ggplot(wideData, aes(x = viewcat, y = letPAG, fill = viewcat)) +
-geom_boxplot(show.legend=FALSE) +
-  xlab("View Time (higher value=more)") + 
-  ylab("PAG") + 
-  labs(title = "Letters") 
-plot
-
-plot <- ggplot(wideData, aes(x = viewcat, y = numbPAG, fill = viewcat)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("View Time") + 
-  ylab("PAG") + 
-  labs(title = "Numbers") 
-plot
-
-plot <- ggplot(wideData, aes(x = viewcat, y = formPAG, fill = viewcat)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("View Time") + 
-  ylab("PAG") + 
-  labs(title = "Forms") 
-plot
-```
-
-Similar to @fig-LNF1, all three plots in @fig-LNF2 seem to indicate a positive
-relationship between viewing time and percent score increase. However, by
-comparison to the plots using percent increase as the response variable, the
-data have a much wider spread with many more outliers. This could pose some
-problems in future modeling. 
-
-[move to Appendix]
-```{r}
-#| label: fig-LNF3
-#| echo: false
-#| warning: false
-#| fig-cap: "Comparing Percent Increase Across Three Subjects: Letters, Numbers, and Forms"
-#| layout-ncol: 1
-
-
-plot <- ggplot(longData, aes(x=which_test, y=diff_pct, fill=which_test)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Which Test") + 
-  ylab("Percent Increase") +
-  labs(title = "Percent Increase by Test") 
-plot
-
-```
-The plot in @fig-LNF3 doesn't indicate a clear trend with regards to which
-subject Sesame Street teaches the most effectively. The highest median is
-forms, followed by numbers and then letters. However, all three boxplots have
-significant overlap with each other, which means that statistical analysis will
-likely not yield usable differences. 
-
-[move to Appendix]
-```{r}
-#| label: fig-LNF4
-#| echo: false
-#| warning: false
-#| fig-cap: "Comparing PAG Across Three Subjects: Letters, Numbers, and Forms"
-#| layout-ncol: 1
-
-
-plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Which Test") + 
-  ylab("PAG") +
-  labs(title = "Percent Achievable Gain (PAG) by Test") 
-plot
-
-```
-
-Once again, it appears that PAG introduces a lot of additional variance
-compared to the same plot using percent increase as the response variable. In
-this case, there is clearly significant left-skew in the data with lots of
-outliers. Despite this, the plot in @fig-LNF4 does appear to show similar
-results as the plot in @fig-LNF3. When put on the same scale, the values appear
-to be similar around the middle of the boxplot.
-
-For simplicity, all investigation of possible confounders (below), was done
-with only percent increase as response variable. 
-
-[move to Appendix]
-```{r}
-#| label: fig-Encour
-#| echo: false
-#| warning: false
-#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Encouragement "
-#| layout-ncol: 3
-#| fig-subcap:  
-#|   - "Letters"
-#|   - "Numbers"
-#|   - "Forms"
-
-plot <- ggplot(wideData, aes(x = encour, y = let_diff_pct, fill = encour)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Encouragement") + 
-  ylab("Percent Increase") + 
-  labs(title = "Letters") 
-plot
-
-plot <- ggplot(wideData, aes(x = encour, y = numb_diff_pct, fill = encour)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Encouragement") + 
-  ylab("Percent Increase") + 
-  labs(title = "Numbers")
-plot
-
-plot <- ggplot(wideData, aes(x = encour, y = form_diff_pct, fill = encour)) +
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Encouragement") + 
-  ylab("Percent Increase") + 
-  labs(title = "Forms") 
-plot
-
-```
-The plots in @fig-Encour have somewhat unclear results. Encouragement may have
-an impact on percent score increase, particularly for letters, but there is
-enough overlap of the boxplots in all three plots that more analysis is needed.
-This may be an important confounder to consider in modeling.
-
-[move to Appendix]
-```{r}
-#| label: fig-Sex
-#| echo: false
-#| warning: false
-#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Sex "
-#| layout-ncol: 1
-
-
-plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = sex)) + 
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Which Test") +
-  ylab("Percent Increase") + 
-  labs(title = "Percent Increase by Sex")
-plot
-```
-The plot in @fig-Sex seems to show little to no relationship between sex and
-percent increase in score in any of the tests. It does not appear that sex will
-be an important confounder to consider in modeling. 
+Due to the more well-behaved nature of improvement compared to PAG, that will
+be the response variable we use in modeling. In the following investigation of possible
+confounders (below), we will use only improvement.
 
 ```{r}
 #| label: fig-Site
 #| echo: false
 #| warning: false
-#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Site "
+#| fig-cap: "Comparing Improvement Across Three Subjects (Letters, Numbers, and Forms) depending on Site "
 #| layout-ncol: 1
 
 
-plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = site)) + 
+plot <- ggplot(longData, aes(x = site, y = diff_pct, fill = which_test)) + 
   geom_boxplot() +
-  xlab("Which Test") +
-  ylab("Percent Increase") + 
-  labs(title = "Percent Increase by Site") 
+  xlab("Site") +
+  ylab("Improvement") + 
+  labs(title = "Improvement by Site", fill="Which Test") 
 plot
 ```
 
 The plot in @fig-Site shows some variation in score improvement across the
-different sites for all three tests. Not only is median percent increase in
+different sites for all three tests. Not only is median improvement in
 score different depending on the site, but the variability is not uniform
 across groups either. This variable seems to be an important confounder, and we
 will have to look out for issues with the non-uniform varibility. 
@@ -350,7 +201,7 @@ will have to look out for issues with the non-uniform varibility.
 #| label: fig-Age
 #| echo: false
 #| warning: false
-#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Age "
+#| fig-cap: "Comparing Improvement Across Three Subjects (Letters, Numbers, and Forms) depending on Age "
 #| layout-ncol: 1
 
 
@@ -362,35 +213,15 @@ plot <- ggplot(longData, aes(x = age, y = diff_pct, col = which_test)) +
 plot 
 ```
 
-The plot in @fig-Age seems to show little to no relationship between age and
-percent increase in score in any of the tests. The points appear to be
-scattered more or less at random. It does not appear that age will be an
-important confounder to consider in modeling.
-
-[move to Appendix]
-```{r}
-#| label: fig-Setting
-#| echo: false
-#| warning: false
-#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Setting "
-#| layout-ncol: 1
+The plot in @fig-Age doesn't appear to show a strong relationship between age and
+improvement in score in any of the tests. The points appear to be
+scattered more or less at random. It remains unclear whether or not age will be an 
+important confounder to in our models. 
 
 
-plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = setting)) + 
-  geom_boxplot(show.legend=FALSE) +
-  xlab("Which Test") +
-  ylab("Percent Increase") + 
-  labs(title = "Percent Increase by Setting") 
-plot
-```
-The plot in @fig-Setting seems to show little to no relationship between
-setting and percent increase in score in any of the tests. It does not appear
-that setting will be an important confounder to consider in modeling.
+# Statistical Analysis 
 
-
-## 3. Statistical Analysis 
-
-### Research Question 1: Setup
+### Research Question 1
 To address the first research question, we fit three multiple linear regression
 models: one for each subject. The models predicted improvement using prescore,
 age, viewcat, and site. The models were all of the form:
@@ -411,9 +242,6 @@ intercept, and its interpretation is not important in this context. A (type II)
 ANOVA table for each model is included in @tbl-anova-1, @tbl-anova-2, and
 @tbl-anova-3. 
 
-# Statistical Analysis
-
-## Research Question 1
 ```{r}
 #| label: tbl-anova-1
 #| warning: false
@@ -681,23 +509,207 @@ reveal any significant or, more importantly, interpretable results. At this
 point, we recalled  that the client is interested in improving "Sesame Street"
 programming, meaning information about socio-economic status is not as important
 to them as the effect of their programming on children who watched their
-programming to various degrees. For this reason, we ommitted the site and
+programming to various degrees. For this reason, we ommitted the site interaction term and
 three-way fits.
 
 ## Technical Appendix
 
 ### Further EDA
 
-* Include all the EDA we take out of EDA section *
+```{r}
+#| label: fig-LNF2
+#| echo: false
+#| warning: false
+#| fig-cap: "The Relationship Between Viewing Time of Sesame Street PAG for Letters, Numbers, and Forms. Note that viewing time is categorical with higher values corresponding to more time viewing Sesame Street"
+#| layout-ncol: 3
+#| fig-subcap:  
+#|   - "Letters"
+#|   - "Numbers"
+#|   - "Forms"
 
-### Add in t-tests for the differences in means (pairs) corresponding to each CI plot we have above
+plot <- ggplot(wideData, aes(x = viewcat, y = letPAG, fill = viewcat)) +
+geom_boxplot(show.legend=FALSE) +
+  xlab("View Time (higher value=more)") + 
+  ylab("PAG") + 
+  labs(title = "Letters") 
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = numbPAG, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("PAG") + 
+  labs(title = "Numbers") 
+plot
+
+plot <- ggplot(wideData, aes(x = viewcat, y = formPAG, fill = viewcat)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("View Time") + 
+  ylab("PAG") + 
+  labs(title = "Forms") 
+plot
+```
+
+Similar to @fig-LNF1, all three plots in @fig-LNF2 seem to indicate a positive
+relationship between viewing time and percent score increase. However, by
+comparison to the plots using improvement as the response variable, the
+data have a much wider spread with many more outliers. This could pose some
+problems in future modeling. 
+
+```{r}
+#| label: fig-LNF3
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects: Letters, Numbers, and Forms"
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x=which_test, y=diff_pct, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") + 
+  ylab("Percent Increase") +
+  labs(title = "Percent Increase by Test") 
+plot
+
+```
+The plot in @fig-LNF3 doesn't indicate a clear trend with regards to which
+subject Sesame Street teaches the most effectively. The highest median is
+forms, followed by numbers and then letters. However, all three boxplots have
+significant overlap with each other, which means that statistical analysis will
+likely not yield usable differences. 
+
+```{r}
+#| label: fig-LNF4
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing PAG Across Three Subjects: Letters, Numbers, and Forms"
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x=which_test, y=PAG, fill=which_test)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") + 
+  ylab("PAG") +
+  labs(title = "Percent Achievable Gain (PAG) by Test") 
+plot
+
+```
+
+Once again, it appears that PAG introduces a lot of additional variance
+compared to the same plot using improvement as the response variable. In
+this case, there is clearly significant left-skew in the data with lots of
+outliers. Despite this, the plot in @fig-LNF4 does appear to show similar
+results as the plot in @fig-LNF3. When put on the same scale, the values appear
+to be similar around the middle of the boxplot.
+
+```{r}
+#| label: fig-Encour
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Encouragement "
+#| layout-ncol: 3
+#| fig-subcap:  
+#|   - "Letters"
+#|   - "Numbers"
+#|   - "Forms"
+
+plot <- ggplot(wideData, aes(x = encour, y = let_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Letters") 
+plot
+
+plot <- ggplot(wideData, aes(x = encour, y = numb_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Numbers")
+plot
+
+plot <- ggplot(wideData, aes(x = encour, y = form_diff_pct, fill = encour)) +
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Encouragement") + 
+  ylab("Percent Increase") + 
+  labs(title = "Forms") 
+plot
+
+```
+The plots in @fig-Encour have somewhat unclear results. Encouragement may have
+an impact on percent score increase, particularly for letters, but there is
+enough overlap of the boxplots in all three plots that more analysis is needed.
+This may be an important confounder to consider in modeling.
+
+```{r}
+#| label: fig-Sex
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Sex "
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = sex)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Sex")
+plot
+```
+The plot in @fig-Sex seems to show little to no relationship between sex and
+improvement in score in any of the tests. It does not appear that sex will
+be an important confounder to consider in modeling. 
+
+```{r}
+#| label: fig-Setting
+#| echo: false
+#| warning: false
+#| fig-cap: "Comparing Percent Increase Across Three Subjects (Letters, Numbers, and Forms) depending on Setting "
+#| layout-ncol: 1
+
+
+plot <- ggplot(longData, aes(x = which_test, y = diff_pct, fill = setting)) + 
+  geom_boxplot(show.legend=FALSE) +
+  xlab("Which Test") +
+  ylab("Percent Increase") + 
+  labs(title = "Percent Increase by Setting") 
+plot
+```
+The plot in @fig-Setting seems to show little to no relationship between
+setting and improvement in score in any of the tests. It does not appear
+that setting will be an important confounder to consider in modeling.
+
+
+### T-tests corresponding to marginal differences 
+
+```{r}
+#| label: marginal-mean-tests
+#| warning: false
+#| fig-cap: "These are the actual pairwise comparisons with p-values that we reference in our analysis"
+#| fig-align: "center"
+
+print("Letters model:")
+pairs(let_means)
+
+print("Forms model:")
+pairs(form_means)
+
+print("Numbers model:")
+pairs(numb_means)
+
+print("Mixed model:")
+pairs(mixed_model_means)
+
+```
+
+
 
 ### Assess conditions of linear models for each subject (letters, forms, numbers)
+
+To ensure that our multiple linear regression models are trustworthy, we must check that the residuals (prediction errors) behave as they should be. That is, we must make sure that they are both normally distributed and that they have constant variability. 
 ```{r}
 #| label: fig-eval-linear-models
 #| echo: false
 #| warning: false
-#| fig-cap: "Insert caption"
+#| fig-cap: "Fitted vs Residuals and qqplot of residuals for each model (letters, forms, and numbers) to evaluate linear modeling conditions"
 #| fig-align: "center"
 #| layout-ncol: 2
 #| layout-nrow: 3
@@ -712,44 +724,29 @@ mplot(form_lm, which = c(1,2))
 mplot(numb_lm, which = c(1,2))
 ```
 
+Each row in @fig-eval-linear-models corresponds to the models for letters, forms, and numbers (in that order). The plots on the left (residuals vs fitted) help us check whether variability is relatively constant across the fitted values, and that appears to be the case for all three models. The plots on the right (qqplot of residuals) help us check whether the residuals are normally distributed. If the points roughly follow the dotted line, that indicates to us that the residuals are normal, and in this case they are not entirely perfect with a little bit of tailing on the ends, but overall the qqplots look reasonable. 
 
-### Assess conditions of mixed models
+### Assess conditions of mixed model
+
+Assessing conditions for the mixed model is very similar to assessing the conditions of the multiple linear regression models, with the difference that we must also make sure that the random effects are also normally distributed (this was an assumption of our model). 
+
 ```{r}
 #| label: fig-eval-mixed-model
 #| echo: false
 #| warning: false
-#| fig-cap: "Insert caption"
+#| fig-cap: "Fitted vs Residuals and qqplot of residuals for each mixed model to evaluate mixed modeling conditions"
 #| fig-align: "center"
 #| layout-ncol: 1
 #| layout-nrow: 3
 
-mixed_model <- lmer(diff_pct ~ which_test*viewcat + which_test*site + (1|ID), data = longData)
-Anova(mixed_model)
-summary(mixed_model)
-
-mixed_model_means <- emmeans(mixed_model, ~which_test|viewcat, adjust = 'HSD')
-plot(mixed_model_means, comparisons=T)
-summary(mixed_model_means)
-pairs(mixed_model_means)
-
-mixed_model_means2 <- emmeans(mixed_model, ~which_test|site, adjust = 'HSD')
-plot(mixed_model_means2, comparisons=T)
-
-
-#likelihood ratio test to see if mixed model is needed
-unmixed_model <- lm(diff_pct ~ which_test*viewcat + site, data=longData)
-
-G2 = -2 * logLik(unmixed_model) + 2 * logLik(mixed_model)
-pchisq(as.numeric(G2), df=1, lower.tail=F)
-
-# make sure effect sizes are not tiny
-effectsize(mixed_model)
-
 plot(mixed_model)
 res_mm <- residuals(mixed_model)
-qqnorm(res_mm)
+qqnorm(res_mm, main = "Normal QQPlot for residuals")
 qqline(res_mm, col='red')
 
-qqnorm(unlist(ranef(mixed_model)))
+qqnorm(unlist(ranef(mixed_model)), main = "Normal QQPlot for random effect")
 qqline(res_mm, col='red')
+
 ```
+
+Similarly to the evalutatory plots above, the plots in @fig-eval-mixed-model all look reasonable per our standards. The qqplot for the random effects does have some tailing on the left side, but this is not drastic enough to cause us a lot of concern. 
